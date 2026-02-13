@@ -1,0 +1,56 @@
+name: Backend Deploy
+on:
+  push:
+    branches: [main]
+    paths:
+      - "backend/**"
+  workflow_call:
+
+jobs:
+  # This job fetches outputs needed by the backend
+  infra_output:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    outputs:
+      uinlp_backend_image_uri: ${{ steps.terraform_output.outputs.uinlp_backend_image_uri }}
+    steps:
+      - name: "Checkout code"
+        uses: actions/checkout@v4
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.14.3
+          terraform_wrapper: false
+      - name: "Configure AWS credentials(OIDC)"
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: "${{ secrets.AWS_ROLE_TO_ASSUME }}"
+          role-session-name: "github-actions"
+          aws-region: "${{ vars.AWS_REGION }}"
+      - name: "Terraform output"
+        id: terraform_output
+        run: bash ${{ github.workspace }}/.github/workflows/terraform-output.sh
+        working-directory: "infra/environments/prod"
+
+  backend:
+    needs: infra_output
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: "Configure AWS credentials(OIDC)"
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: "${{ secrets.AWS_ROLE_TO_ASSUME }}"
+          role-session-name: "github-actions"
+          aws-region: "${{ vars.AWS_REGION }}"
+      - name: Backend Sync
+        env:
+          BACKEND_IMAGE_URI: ${{ needs.infra_output.outputs.uinlp_backend_image_uri }}
+        run: bash ${{ github.workspace }}/.github/workflows/backend-sync.sh
+        working-directory: "backend"
