@@ -1,54 +1,48 @@
-# IAM role for Lambda execution
-data "aws_iam_policy_document" "assume_role" {
-  statement {
-    effect = "Allow"
+data "aws_ecr_authorization_token" "token" {}
 
-    principals {
-      type        = "Service"
-      identifiers = ["lambda.amazonaws.com"]
-    }
-
-    actions = ["sts:AssumeRole"]
+provider "docker" {
+  registry_auth {
+    username = data.aws_ecr_authorization_token.token.user_name
+    password = data.aws_ecr_authorization_token.token.password
+    address  = data.aws_ecr_authorization_token.token.proxy_endpoint
   }
 }
 
-resource "aws_iam_role" "uinlp" {
-  name               = "uinlp_lambda_execution_role"
-  assume_role_policy = data.aws_iam_policy_document.assume_role.json
+module "docker_build" {
+  source = "terraform-aws-modules/lambda/aws//modules/docker-build"
+
+  create_ecr_repo = true
+  ecr_repo        = "uinlp_repository"
+  ecr_repo_lifecycle_policy = jsonencode({
+    rules = [{
+      rulePriority = 1,
+      description  = "Keep last 5 images",
+      selection    = { tagStatus = "tagged", tagPrefixList = ["v"], countType = "imageCountMoreThan", countNumber = 5 },
+      action       = { type = "expire" }
+    }]
+  })
+  docker_file_path = "${path.module}/../../../backend/Dockerfile" # Path to your Dockerfile
+  source_path      = "${path.module}/../../../backend"            # Path to your application code
+  platform         = "linux/arm64"
+  image_tag        = "v1.0.0"
 }
 
-resource "aws_iam_role_policy_attachment" "uinlp_basic_execution" {
-  role       = aws_iam_role.uinlp.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-}
+module "lambda_function" {
+  source = "terraform-aws-modules/lambda/aws"
 
-resource "aws_iam_role_policy_attachment" "uinlp_ecr_read" {
-  role       = aws_iam_role.uinlp.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
-}
+  function_name = "uinlp_lambda_funcion"
+  description   = ""
 
-resource "aws_ecr_repository" "uinlp_repository" {
-  name                 = "uinlp-repository"
-  image_tag_mutability = "MUTABLE"
+  create_package = false
+  package_type   = "Image"
+  architectures  = ["arm64"]
 
-  image_scanning_configuration {
-    scan_on_push = true
-  }
-}
+  image_uri = module.docker_build.image_uri
 
-resource "aws_lambda_function" "uinlp" {
-  function_name = "uinlp_lambda_function"
-  role          = aws_iam_role.uinlp.arn
-  package_type  = "Image"
-  image_uri     = "${aws_ecr_repository.uinlp_repository.repository_url}:latest"
-
-#   image_config {
-#     entry_point = ["/lambda-entrypoint.sh"]
-#     command     = ["app.handler"]
-#   }
-
-  memory_size = 512
+  # Standard Lambda configurations
   timeout     = 30
+  memory_size = 512
 
-  architectures = ["arm64"] # Graviton support for better price/performance
+  # The module automatically creates the IAM execution role
+  attach_cloudwatch_logs_policy = true
 }

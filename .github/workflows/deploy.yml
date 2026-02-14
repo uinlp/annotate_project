@@ -29,10 +29,10 @@ jobs:
         run: bash ${{ github.workspace }}/.github/workflows/terraform-deploy.sh
         working-directory: "infra/environments/prod"
   # This job fetches outputs needed by the backend
-  backend:
-    uses: ./.github/workflows/backend.yml
-    needs: infra
-    secrets: inherit
-    permissions:
-      id-token: write
-      contents: read
+  # backend:
+  #   uses: ./.github/workflows/backend.yml
+  #   needs: infra
+  #   secrets: inherit
+  #   permissions:
+  #     id-token: write
+  #     contents: read
