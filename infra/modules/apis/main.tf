@@ -31,8 +31,8 @@ module "docker_build" {
       action       = { type = "expire" }
     }]
   })
-  docker_file_path = "${path.module}/../../../backend/Dockerfile" # Path to your Dockerfile
-  source_path      = "${path.module}/../../../backend"            # Path to your application code
+  docker_file_path = "Dockerfile"                               # Path to your Dockerfile
+  source_path      = abspath("${path.module}/../../../backend") # Path to your application code
   platform         = "linux/arm64"
   image_tag        = "v1.0.0"
 }
