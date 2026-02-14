@@ -1,3 +1,12 @@
+terraform {
+  required_providers {
+    docker = {
+      source  = "kreuzwerker/docker"
+      version = "~> 3.0"
+    }
+  }
+}
+
 data "aws_ecr_authorization_token" "token" {}
 
 provider "docker" {
@@ -9,7 +18,8 @@ provider "docker" {
 }
 
 module "docker_build" {
-  source = "terraform-aws-modules/lambda/aws//modules/docker-build"
+  source  = "terraform-aws-modules/lambda/aws//modules/docker-build"
+  version = "7.2.0"
 
   create_ecr_repo = true
   ecr_repo        = "uinlp_repository"
@@ -28,7 +38,8 @@ module "docker_build" {
 }
 
 module "lambda_function" {
-  source = "terraform-aws-modules/lambda/aws"
+  source  = "terraform-aws-modules/lambda/aws"
+  version = "7.2.0"
 
   function_name = "uinlp_lambda_funcion"
   description   = ""
