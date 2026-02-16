@@ -72,6 +72,8 @@ module "api_gateway" {
     allow_origins = ["*"]
   }
 
+  create_domain_name = false
+
   routes = {
     "$default" = {
       integration = {
