@@ -34,14 +34,14 @@ module "docker_build" {
   docker_file_path = "Dockerfile"                               # Path to your Dockerfile
   source_path      = abspath("${path.module}/../../../backend") # Path to your application code
   platform         = "linux/amd64"
-  image_tag        = "v1.0.2"
+  image_tag        = "v1.0.3"
 }
 
 module "lambda_function" {
   source  = "terraform-aws-modules/lambda/aws"
   version = "7.2.0"
 
-  function_name = "uinlp_lambda_funcion"
+  function_name = "uinlp_lambda_function"
   description   = ""
 
   create_package = false
@@ -73,12 +73,24 @@ module "api_gateway" {
   }
 
   create_domain_name = false
+  create_stage       = true
+  stage_name         = "default"
+  deploy_stage       = true
 
   routes = {
-    "$default" = {
+    "ANY /{proxy+}" = {
       integration = {
-        uri = "${module.lambda_function.lambda_function_arn}"
+        uri = module.lambda_function.lambda_function_arn
       }
     }
   }
 }
+
+# resource "aws_lambda_permission" "api_gw" {
+#   statement_id  = "AllowExecutionFromAPIGateway"
+#   action        = "lambda:InvokeFunction"
+#   function_name = module.lambda_function.lambda_function_name
+#   principal     = "apigateway.amazonaws.com"
+
+#   source_arn = "${module.api_gateway.api_execution_arn}/*/*"
+# }
