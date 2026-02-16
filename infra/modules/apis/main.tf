@@ -57,3 +57,26 @@ module "lambda_function" {
   # The module automatically creates the IAM execution role
   attach_cloudwatch_logs_policy = true
 }
+
+
+module "api_gateway" {
+  source = "terraform-aws-modules/apigateway-v2/aws"
+
+  name          = "uinlp_api"
+  description   = "UINLP REST API"
+  protocol_type = "HTTP"
+
+  cors_configuration = {
+    allow_headers = ["content-type", "x-amz-date", "authorization", "x-api-key", "x-amz-security-token", "x-amz-user-agent"]
+    allow_methods = ["*"]
+    allow_origins = ["*"]
+  }
+
+  routes = {
+    "$default" = {
+      integration = {
+        uri = "${module.lambda_function.lambda_function_arn}"
+      }
+    }
+  }
+}
