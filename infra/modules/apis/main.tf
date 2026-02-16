@@ -33,7 +33,7 @@ module "docker_build" {
   })
   docker_file_path = "Dockerfile"                               # Path to your Dockerfile
   source_path      = abspath("${path.module}/../../../backend") # Path to your application code
-  platform         = "linux/arm64"
+  platform         = "linux/amd64"
   image_tag        = "v1.0.0"
 }
 
@@ -46,7 +46,7 @@ module "lambda_function" {
 
   create_package = false
   package_type   = "Image"
-  architectures  = ["arm64"]
+  architectures  = ["x86_64"]
 
   image_uri = module.docker_build.image_uri
 
