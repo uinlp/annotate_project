@@ -85,12 +85,11 @@ module "api_gateway" {
     }
   }
 }
-
-# resource "aws_lambda_permission" "api_gw" {
-#   statement_id  = "AllowExecutionFromAPIGateway"
-#   action        = "lambda:InvokeFunction"
-#   function_name = module.lambda_function.lambda_function_name
-#   principal     = "apigateway.amazonaws.com"
-
-#   source_arn = "${module.api_gateway.api_execution_arn}/*/*"
-# }
+# 3. Grant API Gateway permission to invoke Lambda
+resource "aws_lambda_permission" "apigw" {
+  statement_id  = "AllowExecutionFromAPIGateway"
+  action        = "lambda:InvokeFunction"
+  function_name = module.lambda_function.lambda_function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${module.api_gateway.apigatewayv2_api_execution_arn}/*/*"
+}
