@@ -74,11 +74,11 @@ module "api_gateway" {
 
   create_domain_name = false
   create_stage       = true
-  stage_name         = "default"
+  stage_name         = "$default"
   deploy_stage       = true
 
   routes = {
-    "ANY /{proxy+}" = {
+    "$default" = {
       integration = {
         uri = module.lambda_function.lambda_function_arn
       }
