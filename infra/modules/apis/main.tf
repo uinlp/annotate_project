@@ -24,17 +24,29 @@ module "docker_build" {
   create_ecr_repo = true
   ecr_repo        = "uinlp_repository"
   ecr_repo_lifecycle_policy = jsonencode({
-    rules = [{
-      rulePriority = 1,
-      description  = "Keep last 5 images",
-      selection    = { tagStatus = "tagged", tagPrefixList = ["v"], countType = "imageCountMoreThan", countNumber = 5 },
-      action       = { type = "expire" }
-    }]
+    "rules" : [
+      {
+        "rulePriority" : 1,
+        "description" : "Keep only the last 2 images",
+        "selection" : {
+          "tagStatus" : "any",
+          "countType" : "imageCountMoreThan",
+          "countNumber" : 2
+        },
+        "action" : {
+          "type" : "expire"
+        }
+      }
+    ]
   })
-  docker_file_path = "Dockerfile"                               # Path to your Dockerfile
-  source_path      = abspath("${path.module}/../../../backend") # Path to your application code
+  docker_file_path = "Dockerfile"      # Path to your Dockerfile
+  source_path      = local.source_path # Path to your application code
   platform         = "linux/amd64"
-  image_tag        = "v1.0.4"
+  use_image_tag    = false
+
+  triggers = {
+    dir_sha = local.dir_sha
+  }
 }
 
 module "lambda_function" {

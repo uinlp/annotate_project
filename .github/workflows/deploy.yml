@@ -2,8 +2,8 @@ name: Infrastructure Deploy
 on:
   push:
     branches: [main]
-    paths:
-      - "infra/**"
+    # paths:
+    #   - "infra/**"
   workflow_dispatch:
 
 jobs:
