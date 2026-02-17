@@ -34,7 +34,7 @@ module "docker_build" {
   docker_file_path = "Dockerfile"                               # Path to your Dockerfile
   source_path      = abspath("${path.module}/../../../backend") # Path to your application code
   platform         = "linux/amd64"
-  image_tag        = "v1.0.3"
+  image_tag        = "v1.0.4"
 }
 
 module "lambda_function" {
