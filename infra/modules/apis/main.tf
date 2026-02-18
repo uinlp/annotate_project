@@ -46,7 +46,6 @@ module "docker_build" {
 
   triggers = {
     dir_sha = local.dir_sha
-    chr     = "abc"
   }
 }
 
