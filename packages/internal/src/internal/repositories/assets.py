@@ -28,11 +28,11 @@ class AssetsRepository:
             self.assets_table.put_item(
                 Item=AssetModel.model_validate(
                     {
-                        **asset.model_dump(),
+                        **asset.model_dump(mode="json"),
                         "dataset_batch_key": batch_key,
                         "id": f"{asset.id}#{batch_key}",
                         "name": f"{asset.name} #{batch_key}",
                     }
-                ).model_dump()
+                ).model_dump(mode="json")
             )
         return asset

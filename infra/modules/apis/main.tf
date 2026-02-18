@@ -106,6 +106,11 @@ resource "aws_iam_role_policy" "role_policy" {
         Effect   = "Allow"
         Resource = var.datasets_objects_bucket_arn
       },
+      {
+        Action   = "s3:*"
+        Effect   = "Allow"
+        Resource = var.datasets_temp_bucket_arn
+      },
     ]
   })
 }

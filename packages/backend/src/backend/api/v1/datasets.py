@@ -2,7 +2,11 @@ from fastapi.routing import APIRouter
 from fastapi import Path
 from typing import Annotated
 
-from internal.database.models.datasets import DatasetModel, DatasetCreateModel
+from internal.database.models.datasets import (
+    DatasetModel,
+    DatasetCreateModel,
+    DatasetUploadModel,
+)
 from internal.repositories.datasets import DatasetsRepository
 
 
@@ -17,7 +21,7 @@ def list_datasets() -> list[DatasetModel]:
 
 
 @router.post("/")
-def create_dataset(dataset: DatasetCreateModel) -> DatasetModel:
+def create_dataset(dataset: DatasetCreateModel) -> DatasetUploadModel:
     return datasets_repository.create_dataset(dataset)
 
 
