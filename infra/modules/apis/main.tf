@@ -99,16 +99,18 @@ module "api_gateway" {
   routes = {
     "$default" = {
       integration = {
-        uri = module.lambda_function.lambda_function_arn
+        uri                    = module.lambda_function.lambda_function_arn
+        payload_format_version = "2.0"
       }
     }
   }
 }
+
 # 3. Grant API Gateway permission to invoke Lambda
 resource "aws_lambda_permission" "apigw" {
   statement_id  = "AllowExecutionFromAPIGateway"
   action        = "lambda:InvokeFunction"
   function_name = module.lambda_function.lambda_function_name
   principal     = "apigateway.amazonaws.com"
-  source_arn    = "${module.api_gateway.api_execution_arn}/*/*"
+  source_arn    = "${module.api_gateway.api_execution_arn}/*"
 }
