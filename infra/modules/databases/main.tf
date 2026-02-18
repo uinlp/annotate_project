@@ -59,7 +59,7 @@ module "uinlp_assets" {
 module "datasets_objects_bucket" {
   source = "terraform-aws-modules/s3-bucket/aws"
 
-  bucket_prefix = "datasets-objects"
+  bucket_prefix = "uinlp-datasets-objects"
   acl           = "private"
 
   control_object_ownership = true
@@ -69,7 +69,7 @@ module "datasets_objects_bucket" {
 module "datasets_temp_bucket" {
   source = "terraform-aws-modules/s3-bucket/aws"
 
-  bucket_prefix = "datasets-temp"
+  bucket_prefix = "uinlp-datasets-temp"
   acl           = "private"
 
   control_object_ownership = true

@@ -21,6 +21,7 @@ classifiers = [
 ]
 dependencies = [
   "internal @ file:../internal",
+  "aws-lambda-powertools",
 ]
 
 [project.urls]
