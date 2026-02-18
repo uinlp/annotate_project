@@ -3,8 +3,8 @@ from fastapi.routing import APIRouter
 from fastapi import Path
 from typing import Annotated
 
-from database.models.assets import AssetModel
-from repositories.assets import AssetsRepository
+from internal.database.models.assets import AssetModel, AssetCreateModel
+from internal.repositories.assets import AssetsRepository
 
 
 router = APIRouter()
@@ -13,24 +13,15 @@ assets_repository = AssetsRepository()
 
 
 @router.get("/")
-def get_assets() -> list[AssetModel]:
+def list_assets() -> list[AssetModel]:
     return assets_repository.list_assets()
 
 
-@router.get("/{data_id}")
-def get_asset(data_id: Annotated[str, Path()]) -> AssetModel:
-    assets = assets_repository.list_assets()
-    for asset in assets:
-        if asset.data_id == data_id:
-            return asset
-    raise ValueError(f"Asset with data_id {data_id} not found")
+@router.post("/")
+def create_asset(asset: AssetCreateModel) -> AssetModel:
+    return assets_repository.create_asset(asset)
 
 
-@router.get("/{data_id}/download")
-def download_asset(data_id: Annotated[str, Path()]):
-    """
-    Download asset in zip format
-    """
-    return FileResponse(
-        f"src/repositories/assets_data/{data_id}.zip", media_type="application/zip"
-    )
+@router.get("/{asset_id}")
+def get_asset(asset_id: Annotated[str, Path()]) -> AssetModel:
+    return assets_repository.get_asset(asset_id)

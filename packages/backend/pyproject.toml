@@ -17,8 +17,6 @@ dependencies = [
   "fastapi[standard]",
   "mangum",
   "aws-lambda-powertools",
-  "pydantic",
-  "boto3",
   "internal @ file:../internal",
 ]
 

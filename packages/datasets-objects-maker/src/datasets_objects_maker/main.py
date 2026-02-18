@@ -4,4 +4,5 @@ logger = Logger()
 
 
 def handler(event, context):
-    logger.info("Hello! Ping Pong")
+    logger.info(f"Event: {event}")
+    logger.info(f"Context: {context}")
