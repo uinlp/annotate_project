@@ -1,9 +1,14 @@
 provider "aws" {}
 
-module "apis" {
-  source = "../../modules/apis"
+module "databases" {
+  source = "../../modules/databases"
 }
 
-# module "databases" {
-#   source = "../../modules/databases"
-# }
+module "apis" {
+  source = "../../modules/apis"
+
+  datasets_table_name          = module.databases.uinlp_datasets_table_name
+  assets_table_name            = module.databases.uinlp_assets_table_name
+  datasets_objects_bucket_name = module.databases.datasets_objects_bucket_name
+  datasets_temp_bucket_name    = module.databases.datasets_temp_bucket_name
+}

@@ -1,0 +1,12 @@
+services:
+  backend:
+    build:
+      context: ..
+      dockerfile: backend/Dockerfile.local
+    container_name: uinlp_backend_local
+    ports:
+      - "8001:8000"
+    volumes:
+      - ./src/backend/:/var/task
+    env_file:
+      - .env.local

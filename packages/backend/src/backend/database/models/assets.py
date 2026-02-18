@@ -29,3 +29,26 @@ class AnnotateAssetModel(BaseModel):
     updated_at: datetime
     annotate_fields: list[AnnotateFieldModel]
     tags: list[str] = []
+
+
+class DatasetModel(BaseModel):
+    id: str
+    name: str
+    description: str
+    created_at: datetime
+    updated_at: datetime
+    batch_size: int
+    total_objects: int | None = None
+
+
+class AssetModel(BaseModel):
+    id: str
+    dataset_id: str
+    dataset_object_key: str
+    task_type: TaskTypeEnum
+    title: str
+    description: str
+    created_at: datetime
+    updated_at: datetime
+    annotate_fields: list[AnnotateFieldModel]
+    tags: list[str] = []

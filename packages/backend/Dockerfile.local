@@ -1,0 +1,24 @@
+FROM public.ecr.aws/lambda/python:3.10
+
+# Upgrade pip to avoid issues with older versions
+RUN pip install --upgrade pip
+
+# The build context is 'packages/' as defined in compose.local.yml
+COPY . /tmp/packages
+# Install the backend package by navigating to its directory
+# Leverage a cache mount to /root/.cache/pip to speed up subsequent builds.
+RUN --mount=type=cache,target=/root/.cache/pip \
+    cd /tmp/packages/backend && pip install .
+
+# Remove the temporary build packages
+RUN rm -rf /tmp/packages
+
+# Copy the application source code to Lambda's task root
+# We copy contents of backend/src/backend/ directly to ${LAMBDA_TASK_ROOT}
+COPY backend/src/backend/ ${LAMBDA_TASK_ROOT}/
+
+# Exposed port for uvicorn
+EXPOSE 8000
+
+# Override the default Lambda entrypoint to run uvicorn
+ENTRYPOINT ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]

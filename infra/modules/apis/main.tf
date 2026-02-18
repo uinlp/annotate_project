@@ -22,7 +22,7 @@ module "docker_build" {
   version = "7.2.0"
 
   create_ecr_repo = true
-  ecr_repo        = "uinlp_repository"
+  ecr_repo        = "uinlp_backend_repository"
   ecr_repo_lifecycle_policy = jsonencode({
     "rules" : [
       {
@@ -39,8 +39,8 @@ module "docker_build" {
       }
     ]
   })
-  docker_file_path = "Dockerfile"      # Path to your Dockerfile
-  source_path      = local.source_path # Path to your application code
+  docker_file_path = local.docker_file_path
+  source_path      = local.source_path
   platform         = "linux/amd64"
   use_image_tag    = false
 
@@ -61,6 +61,13 @@ module "lambda_function" {
   architectures  = ["x86_64"]
 
   image_uri = module.docker_build.image_uri
+
+  environment_variables = {
+    DATASETS_TABLE_NAME          = var.datasets_table_name
+    ASSETS_TABLE_NAME            = var.assets_table_name
+    DATASETS_OBJECTS_BUCKET_NAME = var.datasets_objects_bucket_name
+    DATASETS_TEMP_BUCKET_NAME    = var.datasets_temp_bucket_name
+  }
 
   # Standard Lambda configurations
   timeout     = 30

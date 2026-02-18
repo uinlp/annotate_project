@@ -3,8 +3,8 @@ from fastapi.routing import APIRouter
 from fastapi import Path
 from typing import Annotated
 
-from src.database.models.assets import AnnotateAssetModel
-from src.repositories.assets import AssetsRepository
+from database.models.assets import AnnotateAssetModel
+from repositories.assets import AssetsRepository
 
 
 router = APIRouter()
@@ -31,5 +31,6 @@ def download_asset(data_id: Annotated[str, Path()]):
     """
     Download asset in zip format
     """
-    return FileResponse(f"src/repositories/assets_data/{data_id}.zip", media_type='application/zip')
-
+    return FileResponse(
+        f"src/repositories/assets_data/{data_id}.zip", media_type="application/zip"
+    )

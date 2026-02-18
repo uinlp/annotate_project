@@ -1,0 +1,58 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "datasets-objects-maker"
+dynamic = ["version"]
+description = ''
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+keywords = []
+authors = [
+  { name = "Ahmad Khidir", email = "khidirahmad05@gmail.com" },
+]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: Implementation :: CPython",
+]
+dependencies = [
+  "internal @ file:../internal",
+]
+
+[project.urls]
+Documentation = "https://github.com/Ahmad Khidir/datasets-objects-maker#readme"
+Issues = "https://github.com/Ahmad Khidir/datasets-objects-maker/issues"
+Source = "https://github.com/Ahmad Khidir/datasets-objects-maker"
+
+[tool.hatch.version]
+path = "src/datasets_objects_maker/__about__.py"
+
+[tool.hatch.envs.types]
+extra-dependencies = [
+  "mypy>=1.0.0",
+]
+[tool.hatch.envs.types.scripts]
+check = "mypy --install-types --non-interactive {args:src/datasets_objects_maker tests}"
+
+[tool.coverage.run]
+source_pkgs = ["datasets_objects_maker", "tests"]
+branch = true
+parallel = true
+omit = [
+  "src/datasets_objects_maker/__about__.py",
+]
+
+[tool.coverage.paths]
+datasets_objects_maker = ["src/datasets_objects_maker", "*/datasets-objects-maker/src/datasets_objects_maker"]
+tests = ["tests", "*/datasets-objects-maker/tests"]
+
+[tool.coverage.report]
+exclude_lines = [
+  "no cov",
+  "if __name__ == .__main__.:",
+  "if TYPE_CHECKING:",
+]

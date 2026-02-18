@@ -1,5 +1,5 @@
 locals {
-  package_name     = "backend"
+  package_name     = "datasets-objects-maker"
   source_path      = abspath("${path.module}/../../../packages")
   docker_file_path = "${local.source_path}/${local.package_name}/Dockerfile"
 

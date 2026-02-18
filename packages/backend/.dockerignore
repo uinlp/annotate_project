@@ -23,6 +23,7 @@
 **/bin
 **/charts
 **/docker-compose*
+**/compose.*
 **/compose.y*ml
 **/Dockerfile*
 **/node_modules
@@ -30,5 +31,6 @@
 **/obj
 **/secrets.dev.yaml
 **/values.dev.yaml
-LICENSE
-README.md
+**/.aws-sam
+**/dist
+.env**
