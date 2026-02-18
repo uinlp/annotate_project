@@ -81,7 +81,7 @@ module "docker_build" {
   version = "7.2.0"
 
   create_ecr_repo = true
-  ecr_repo        = "uinlp_datasets_objects_maker_repository"
+  ecr_repo        = "uinlp-datasets-objects-maker-repository"
   ecr_repo_lifecycle_policy = jsonencode({
     "rules" : [
       {

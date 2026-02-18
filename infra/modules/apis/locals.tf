@@ -15,7 +15,7 @@ locals {
   ]
 
   # 3. Merge your explicit excludes with the .ignore lines
-  path_exclude  = distinct(concat(["**/__pycache__", "**/.aws-sam"], local.ignore_lines))
+  path_exclude  = local.ignore_lines
   path_include  = ["internal", local.package_name]
   files_include = setunion([for f in local.path_include : fileset(local.source_path, f)]...)
   files_exclude = setunion([for f in local.path_exclude : fileset(local.source_path, f)]...)
