@@ -3,7 +3,7 @@ from fastapi.routing import APIRouter
 from fastapi import Path
 from typing import Annotated
 
-from database.models.assets import AnnotateAssetModel
+from database.models.assets import AssetModel
 from repositories.assets import AssetsRepository
 
 
@@ -13,12 +13,12 @@ assets_repository = AssetsRepository()
 
 
 @router.get("/")
-def get_assets() -> list[AnnotateAssetModel]:
+def get_assets() -> list[AssetModel]:
     return assets_repository.list_assets()
 
 
 @router.get("/{data_id}")
-def get_asset(data_id: Annotated[str, Path()]) -> AnnotateAssetModel:
+def get_asset(data_id: Annotated[str, Path()]) -> AssetModel:
     assets = assets_repository.list_assets()
     for asset in assets:
         if asset.data_id == data_id:

@@ -17,6 +17,9 @@ provider "docker" {
   }
 }
 
+# ===================================
+# Docker Build: UINLP Backend
+# ===================================
 module "docker_build" {
   source  = "terraform-aws-modules/lambda/aws//modules/docker-build"
   version = "7.2.0"
@@ -49,13 +52,17 @@ module "docker_build" {
   }
 }
 
+
+# ===================================
+# Lambda Function: UINLP Backend
+# ===================================
 module "lambda_function" {
   source  = "terraform-aws-modules/lambda/aws"
   version = "7.2.0"
 
-  function_name = "uinlp-backend-function"
-  description   = ""
-
+  function_name  = "uinlp-backend-function"
+  description    = ""
+  role_name      = aws_iam_role.role.name
   create_package = false
   package_type   = "Image"
   architectures  = ["x86_64"]
@@ -77,7 +84,30 @@ module "lambda_function" {
   attach_cloudwatch_logs_policy = true
 }
 
+# Grant lambda function access to dynamodb
+resource "aws_iam_role_policy" "role_policy" {
+  role = module.lambda_function.role_name
+  name = "uinlp-backend-role-policy"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action   = "dynamodb:*"
+        Effect   = "Allow"
+        Resource = var.datasets_table_arn
+      },
+      {
+        Action   = "dynamodb:*"
+        Effect   = "Allow"
+        Resource = var.assets_table_arn
+      },
+    ]
+  })
+}
 
+# ===================================
+# API Gateway: UINLP REST API
+# ===================================
 module "api_gateway" {
   source = "terraform-aws-modules/apigateway-v2/aws"
 
@@ -106,7 +136,7 @@ module "api_gateway" {
   }
 }
 
-# 3. Grant API Gateway permission to invoke Lambda
+# Grant API Gateway permission to invoke Lambda
 resource "aws_lambda_permission" "apigw" {
   statement_id  = "AllowExecutionFromAPIGateway"
   action        = "lambda:InvokeFunction"

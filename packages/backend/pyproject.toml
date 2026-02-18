@@ -25,6 +25,7 @@ dependencies = [
 [tool.hatch.envs.types]
 extra-dependencies = [
   "mypy>=1.0.0",
+  "types-boto3[full]",
 ]
 
 [tool.hatch.build.targets.wheel]
