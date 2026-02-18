@@ -86,7 +86,7 @@ module "lambda_function" {
 
 # Grant lambda function access to dynamodb
 resource "aws_iam_role_policy" "role_policy" {
-  role = module.lambda_function.role_name
+  role = module.lambda_function.lambda_role_name
   name = "uinlp-backend-role-policy"
   policy = jsonencode({
     Version = "2012-10-17"
