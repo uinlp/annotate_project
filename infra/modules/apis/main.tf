@@ -62,8 +62,8 @@ module "lambda_function" {
 
   function_name  = "uinlp-backend-function"
   description    = ""
-  role_name      = aws_iam_role.role.name
   create_package = false
+  create_role    = true
   package_type   = "Image"
   architectures  = ["x86_64"]
 

@@ -14,5 +14,5 @@ module "apis" {
   datasets_table_arn           = module.databases.uinlp_datasets_table_arn
   assets_table_arn             = module.databases.uinlp_assets_table_arn
   datasets_objects_bucket_arn  = module.databases.datasets_objects_bucket_arn
-  datasets_temp_bucket_arn     = module.databases.datasets_temp_bucket_arns
+  datasets_temp_bucket_arn     = module.databases.datasets_temp_bucket_arn
 }
