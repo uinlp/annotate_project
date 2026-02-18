@@ -22,7 +22,7 @@ module "docker_build" {
   version = "7.2.0"
 
   create_ecr_repo = true
-  ecr_repo        = "uinlp_backend_repository"
+  ecr_repo        = "uinlp-backend-repository"
   ecr_repo_lifecycle_policy = jsonencode({
     "rules" : [
       {
@@ -53,7 +53,7 @@ module "lambda_function" {
   source  = "terraform-aws-modules/lambda/aws"
   version = "7.2.0"
 
-  function_name = "uinlp_lambda_function"
+  function_name = "uinlp-backend-function"
   description   = ""
 
   create_package = false
@@ -81,7 +81,7 @@ module "lambda_function" {
 module "api_gateway" {
   source = "terraform-aws-modules/apigateway-v2/aws"
 
-  name          = "uinlp_api"
+  name          = "uinlp-api"
   description   = "UINLP REST API"
   protocol_type = "HTTP"
 

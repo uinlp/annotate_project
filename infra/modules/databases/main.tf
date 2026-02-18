@@ -20,7 +20,7 @@ provider "docker" {
 module "uinlp_datasets" {
   source = "terraform-aws-modules/dynamodb-table/aws"
 
-  name     = "uinlp_datasets"
+  name     = "uinlp-datasets"
   hash_key = "id"
 
   attributes = [
@@ -40,7 +40,7 @@ module "uinlp_datasets" {
 module "uinlp_assets" {
   source = "terraform-aws-modules/dynamodb-table/aws"
 
-  name     = "uinlp_assets"
+  name     = "uinlp-assets"
   hash_key = "id"
 
   attributes = [
@@ -59,7 +59,7 @@ module "uinlp_assets" {
 module "datasets_objects_bucket" {
   source = "terraform-aws-modules/s3-bucket/aws"
 
-  bucket_prefix = "datasets_objects"
+  bucket_prefix = "datasets-objects"
   acl           = "private"
 
   control_object_ownership = true
@@ -69,7 +69,7 @@ module "datasets_objects_bucket" {
 module "datasets_temp_bucket" {
   source = "terraform-aws-modules/s3-bucket/aws"
 
-  bucket_prefix = "datasets_temp"
+  bucket_prefix = "datasets-temp"
   acl           = "private"
 
   control_object_ownership = true
@@ -113,7 +113,7 @@ module "datasets_objects_maker" {
   source  = "terraform-aws-modules/lambda/aws"
   version = "7.2.0"
 
-  function_name = "uinlp_datasets_objects_maker"
+  function_name = "datasets-objects-maker"
   description   = ""
 
   create_package = false

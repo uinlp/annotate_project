@@ -56,3 +56,9 @@ exclude_lines = [
   "if __name__ == .__main__.:",
   "if TYPE_CHECKING:",
 ]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/datasets_objects_maker"]
+
+[tool.hatch.metadata]
+allow-direct-references = true
