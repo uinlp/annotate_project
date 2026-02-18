@@ -1,3 +1,13 @@
+data "aws_ecr_authorization_token" "token" {}
+
+provider "docker" {
+  registry_auth {
+    username = data.aws_ecr_authorization_token.token.user_name
+    password = data.aws_ecr_authorization_token.token.password
+    address  = data.aws_ecr_authorization_token.token.proxy_endpoint
+  }
+}
+
 module "uinlp_datasets" {
   source = "terraform-aws-modules/dynamodb-table/aws"
 
