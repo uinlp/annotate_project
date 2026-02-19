@@ -165,14 +165,20 @@ resource "aws_iam_role_policy" "role_policy" {
         Resource = module.uinlp_assets.dynamodb_table_arn
       },
       {
-        Action   = "s3:*"
-        Effect   = "Allow"
-        Resource = module.datasets_objects_bucket.s3_bucket_arn
+        Action = "s3:*"
+        Effect = "Allow"
+        Resource = [
+          module.datasets_objects_bucket.s3_bucket_arn,
+          "${module.datasets_objects_bucket.s3_bucket_arn}/*"
+        ]
       },
       {
-        Action   = "s3:*"
-        Effect   = "Allow"
-        Resource = module.datasets_temp_bucket.s3_bucket_arn
+        Action = "s3:*"
+        Effect = "Allow"
+        Resource = [
+          module.datasets_temp_bucket.s3_bucket_arn,
+          "${module.datasets_temp_bucket.s3_bucket_arn}/*"
+        ]
       },
     ]
   })
