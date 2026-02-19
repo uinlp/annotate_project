@@ -64,7 +64,7 @@ class DatasetsRepository:
         # Parse the dataset according to its modality
         if dataset.modality == ModalityTypeEnum.TEXT:
             logger.info(f"Modality: {dataset.modality}")
-            batch_count = 0
+            batch_count = 1  # Start from 1
             # Read each file in the extracted folder and process in batches
             for filename in os.listdir("/tmp/datasets"):
                 file_path = f"/tmp/datasets/{filename}"
@@ -96,6 +96,11 @@ class DatasetsRepository:
             # Update the dataset in database with all batch keys
             self.datasets_table.put_item(Item=dataset.model_dump(mode="json"))
             logger.info("Dataset batched successfully")
+            # Remove the dataset from temp bucket
+            self.s3_client.delete_object(
+                Bucket=bucket_name,
+                Key=object_key,
+            )
         elif dataset.modality in (
             ModalityTypeEnum.IMAGE,
             ModalityTypeEnum.AUDIO,
@@ -112,7 +117,7 @@ class DatasetsRepository:
             with zipfile.ZipFile(output, "w", zipfile.ZIP_DEFLATED) as zipf:
                 for line_idx, line in enumerate(batch):
                     # Each line is stored as a separate file in the zip
-                    zipf.writestr(f"data/{line_idx}.txt", line)
+                    zipf.writestr(f"data/{line_idx + 1}.txt", line)
 
             output.seek(0)
             batch_key = f"{dataset.id}#{batch_idx}.zip"
