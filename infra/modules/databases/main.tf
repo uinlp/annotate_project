@@ -191,7 +191,7 @@ module "datasets_temp_notification" {
     datasets_objects_maker = {
       function_arn  = module.datasets_objects_maker.lambda_function_arn
       function_name = module.datasets_objects_maker.lambda_function_name
-      events        = ["s3:ObjectCreated:Put", "s3:ObjectCreated:Post"]
+      events        = ["s3:ObjectCreated:*"]
     }
   }
   create_sqs_policy = false
