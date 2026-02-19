@@ -17,6 +17,9 @@ provider "docker" {
   }
 }
 
+# ===================================
+# DynamoDB Tables
+# ===================================
 module "uinlp_datasets" {
   source = "terraform-aws-modules/dynamodb-table/aws"
 
@@ -56,6 +59,9 @@ module "uinlp_assets" {
   }
 }
 
+# ===================================
+# S3 Buckets
+# ===================================
 module "datasets_objects_bucket" {
   source = "terraform-aws-modules/s3-bucket/aws"
 
@@ -76,6 +82,9 @@ module "datasets_temp_bucket" {
   object_ownership         = "ObjectWriter"
 }
 
+# ===================================
+# ECR Repository
+# ===================================
 module "docker_build" {
   source  = "terraform-aws-modules/lambda/aws//modules/docker-build"
   version = "7.2.0"
@@ -108,15 +117,17 @@ module "docker_build" {
   }
 }
 
-
+# ===================================
+# Lambda Function: Datasets Objects Maker
+# ===================================
 module "datasets_objects_maker" {
   source  = "terraform-aws-modules/lambda/aws"
   version = "7.2.0"
 
-  function_name = "datasets-objects-maker"
-  description   = ""
-
+  function_name  = "datasets-objects-maker"
+  description    = ""
   create_package = false
+  create_role    = true
   package_type   = "Image"
   architectures  = ["x86_64"]
 
@@ -136,9 +147,41 @@ module "datasets_objects_maker" {
   # The module automatically creates the IAM execution role
   attach_cloudwatch_logs_policy = true
 }
+# Grant lambda function access to the resources
+resource "aws_iam_role_policy" "role_policy" {
+  role = module.datasets_objects_maker.lambda_role_name
+  name = "uinlp-backend-role-policy"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action   = "dynamodb:*"
+        Effect   = "Allow"
+        Resource = module.uinlp_datasets.dynamodb_table_arn
+      },
+      {
+        Action   = "dynamodb:*"
+        Effect   = "Allow"
+        Resource = module.uinlp_assets.dynamodb_table_arn
+      },
+      {
+        Action   = "s3:*"
+        Effect   = "Allow"
+        Resource = module.datasets_objects_bucket.s3_bucket_arn
+      },
+      {
+        Action   = "s3:*"
+        Effect   = "Allow"
+        Resource = module.datasets_temp_bucket.s3_bucket_arn
+      },
+    ]
+  })
+}
 
 
-
+# ===================================
+# S3 Bucket Notification
+# ===================================
 module "datasets_temp_notification" {
   source = "terraform-aws-modules/s3-bucket/aws//modules/notification"
 

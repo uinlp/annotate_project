@@ -84,7 +84,7 @@ module "lambda_function" {
   attach_cloudwatch_logs_policy = true
 }
 
-# Grant lambda function access to dynamodb
+# Grant lambda function access to the resources
 resource "aws_iam_role_policy" "role_policy" {
   role = module.lambda_function.lambda_role_name
   name = "uinlp-backend-role-policy"
