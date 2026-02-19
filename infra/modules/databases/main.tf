@@ -150,7 +150,7 @@ module "datasets_objects_maker" {
 # Grant lambda function access to the resources
 resource "aws_iam_role_policy" "role_policy" {
   role = module.datasets_objects_maker.lambda_role_name
-  name = "uinlp-backend-role-policy"
+  name = "uinlp-datasets-objects-maker-role-policy"
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
