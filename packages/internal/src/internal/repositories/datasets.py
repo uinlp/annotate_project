@@ -56,7 +56,7 @@ class DatasetsRepository:
         obj = self.s3_client.get_object(Bucket=bucket_name, Key=object_key)
         data = io.BytesIO(obj["Body"].read())
         with zipfile.ZipFile(data, "r") as zip_ref:
-            zip_ref.extractall("tmp")
+            zip_ref.extractall("/tmp/datasets")
         del data
         dataset = self.get_dataset(object_key.split(".")[0])
         batch_size = dataset.batch_size
@@ -66,8 +66,8 @@ class DatasetsRepository:
             logger.info(f"Modality: {dataset.modality}")
             batch_count = 0
             # Read each file in the extracted folder and process in batches
-            for filename in os.listdir("tmp"):
-                file_path = f"tmp/{filename}"
+            for filename in os.listdir("/tmp/datasets"):
+                file_path = f"/tmp/datasets/{filename}"
                 if not os.path.isfile(file_path) or not filename.endswith(
                     (".txt", ".md")
                 ):
@@ -91,7 +91,7 @@ class DatasetsRepository:
                         batch_count += 1
 
             # Clean up extracted files
-            shutil.rmtree("tmp")
+            shutil.rmtree("/tmp/datasets")
 
             # Update the dataset in database with all batch keys
             self.datasets_table.put_item(Item=dataset.model_dump(mode="json"))
