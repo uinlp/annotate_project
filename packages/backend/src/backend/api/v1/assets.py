@@ -18,8 +18,8 @@ def list_assets() -> list[AssetModel]:
 
 
 @router.post("/")
-def create_asset(asset: AssetCreateModel) -> AssetModel:
-    return assets_repository.create_asset(asset)
+def create_asset(asset: AssetCreateModel) -> None:
+    assets_repository.create_asset(asset)
 
 
 @router.get("/{asset_id}")

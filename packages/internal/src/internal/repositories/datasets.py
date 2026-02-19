@@ -3,6 +3,7 @@ from internal.database.models.datasets import (
     DatasetCreateModel,
     DatasetUploadModel,
     ModalityTypeEnum,
+    DatasetBatchDownloadModel,
 )
 import os
 import boto3
@@ -37,9 +38,7 @@ class DatasetsRepository:
 
     def create_dataset(self, dataset: DatasetCreateModel) -> DatasetUploadModel:
         self.datasets_table.put_item(
-            Item=DatasetModel.model_validate(
-                dataset.model_dump(mode="json")
-            ).model_dump(mode="json")
+            Item=DatasetModel(**dataset.model_dump(mode="json")).model_dump(mode="json")
         )
         upload_url = self.s3_client.generate_presigned_url(
             "put_object",
@@ -125,3 +124,15 @@ class DatasetsRepository:
             self.s3_client.put_object(Bucket=dest_bucket, Key=batch_key, Body=output)
             logger.info(f"Uploaded batch: {batch_key}")
             dataset.batch_keys.append(batch_key)
+
+    def get_batch_download_url(self, batch_key):
+        dataset_objects_bucket = os.environ["DATASETS_OBJECTS_BUCKET_NAME"]
+        url = self.s3_client.generate_presigned_url(
+            "get_object",
+            Params={
+                "Bucket": dataset_objects_bucket,
+                "Key": batch_key,
+            },
+            ExpiresIn=3600,
+        )
+        return DatasetBatchDownloadModel(url=url)

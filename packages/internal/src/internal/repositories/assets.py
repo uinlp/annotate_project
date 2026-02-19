@@ -20,19 +20,19 @@ class AssetsRepository:
         response = self.assets_table.get_item(Key={"id": asset_id})
         return AssetModel(**response["Item"])
 
-    def create_asset(self, asset: AssetCreateModel) -> AssetModel:
+    def create_asset(self, asset: AssetCreateModel) -> None:
         dr = DatasetsRepository()
         dataset = dr.get_dataset(asset.dataset_id)
         # Create one asset for each dataset batch
         for batch_key in dataset.batch_keys:
+            key_num = batch_key.split("#")[1].split(".")[0]
             self.assets_table.put_item(
-                Item=AssetModel.model_validate(
-                    {
+                Item=AssetModel(
+                    **{
                         **asset.model_dump(mode="json"),
                         "dataset_batch_key": batch_key,
-                        "id": f"{asset.id}#{batch_key}",
-                        "name": f"{asset.name} #{batch_key}",
+                        "id": f"{asset.id}#{key_num}",
+                        "name": f"{asset.name} #{key_num}",
                     }
                 ).model_dump(mode="json")
             )
-        return asset

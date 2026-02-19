@@ -6,6 +6,7 @@ from internal.database.models.datasets import (
     DatasetModel,
     DatasetCreateModel,
     DatasetUploadModel,
+    DatasetBatchDownloadModel,
 )
 from internal.repositories.datasets import DatasetsRepository
 
@@ -28,3 +29,10 @@ def create_dataset(dataset: DatasetCreateModel) -> DatasetUploadModel:
 @router.get("/{dataset_id}")
 def get_dataset(dataset_id: Annotated[str, Path()]) -> DatasetModel:
     return datasets_repository.get_dataset(dataset_id)
+
+
+@router.get("/batch-download-url/{batch_key}")
+def get_batch_download_url(
+    batch_key: Annotated[str, Path()],
+) -> DatasetBatchDownloadModel:
+    return datasets_repository.get_batch_download_url(batch_key)
