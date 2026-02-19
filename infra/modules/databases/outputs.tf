@@ -29,3 +29,11 @@ output "datasets_temp_bucket_name" {
 output "datasets_temp_bucket_arn" {
   value = module.datasets_temp_bucket.s3_bucket_arn
 }
+
+output "assets_publishes_bucket_name" {
+  value = module.assets_publishes_bucket.s3_bucket_id
+}
+
+output "assets_publishes_bucket_arn" {
+  value = module.assets_publishes_bucket.s3_bucket_arn
+}

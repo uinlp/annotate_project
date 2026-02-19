@@ -82,6 +82,16 @@ module "datasets_temp_bucket" {
   object_ownership         = "ObjectWriter"
 }
 
+module "publishes_bucket" {
+  source = "terraform-aws-modules/s3-bucket/aws"
+
+  bucket_prefix = "uinlp-assets-publishes"
+  acl           = "private"
+
+  control_object_ownership = true
+  object_ownership         = "ObjectWriter"
+}
+
 # ===================================
 # ECR Repository
 # ===================================

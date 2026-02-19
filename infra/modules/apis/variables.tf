@@ -34,3 +34,11 @@ variable "datasets_temp_bucket_name" {
 variable "datasets_temp_bucket_arn" {
   type = string
 }
+
+variable "assets_publishes_bucket_name" {
+  type = string
+}
+
+variable "assets_publishes_bucket_arn" {
+  type = string
+}

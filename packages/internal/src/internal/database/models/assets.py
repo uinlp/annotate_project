@@ -21,6 +21,7 @@ class AssetModel(BaseModel):
     updated_at: datetime
     annotate_fields: list[AnnotateFieldModel]
     tags: list[str] = []
+    publishers: list[str] = []
 
 
 class AssetCreateModel(BaseModel):
@@ -45,3 +46,7 @@ class AssetCreateModel(BaseModel):
     @property
     def updated_at(self) -> datetime:
         return datetime.now()
+
+
+class AssetPublishModel(BaseModel):
+    url: str

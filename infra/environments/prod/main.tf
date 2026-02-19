@@ -15,4 +15,6 @@ module "apis" {
   assets_table_arn             = module.databases.uinlp_assets_table_arn
   datasets_objects_bucket_arn  = module.databases.datasets_objects_bucket_arn
   datasets_temp_bucket_arn     = module.databases.datasets_temp_bucket_arn
+  assets_publishes_bucket_name = module.databases.assets_publishes_bucket_name
+  assets_publishes_bucket_arn  = module.databases.assets_publishes_bucket_arn
 }

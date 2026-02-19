@@ -74,6 +74,7 @@ module "lambda_function" {
     ASSETS_TABLE_NAME            = var.assets_table_name
     DATASETS_OBJECTS_BUCKET_NAME = var.datasets_objects_bucket_name
     DATASETS_TEMP_BUCKET_NAME    = var.datasets_temp_bucket_name
+    ASSETS_PUBLISHES_BUCKET_NAME = var.assets_publishes_bucket_name
   }
 
   # Standard Lambda configurations
@@ -117,6 +118,14 @@ resource "aws_iam_role_policy" "role_policy" {
           "${var.datasets_temp_bucket_arn}/*"
         ]
       },
+      {
+        Action = "s3:*"
+        Effect = "Allow"
+        Resource = [
+          var.assets_publishes_bucket_arn,
+          "${var.assets_publishes_bucket_arn}/*"
+        ]
+      }
     ]
   })
 }
