@@ -8,6 +8,8 @@ import os
 import boto3
 import io
 import zipfile
+import itertools
+import shutil
 from aws_lambda_powertools.logging import Logger
 
 logger = Logger()
@@ -56,42 +58,42 @@ class DatasetsRepository:
         with zipfile.ZipFile(data, "r") as zip_ref:
             zip_ref.extractall("tmp")
         del data
-        dataset_id = object_key.split(".")[0]
-        dataset = self.get_dataset(dataset_id)
+        dataset = self.get_dataset(object_key.split(".")[0])
         batch_size = dataset.batch_size
         dest_bucket = os.environ["DATASETS_OBJECTS_BUCKET_NAME"]
         # Parse the dataset according to its modality
         if dataset.modality == ModalityTypeEnum.TEXT:
             logger.info(f"Modality: {dataset.modality}")
-            # Read each file in the extracted folder line by line
+            batch_count = 0
+            # Read each file in the extracted folder and process in batches
             for filename in os.listdir("tmp"):
-                logger.info(f"Filename: {filename}")
-                if filename.endswith((".txt", ".md")):
-                    with open(f"tmp/{filename}", "r") as f:
-                        lines = (
-                            f.readlines() if filename.endswith(".txt") else [f.read()]
-                        )
-                    # Create batches of batch_size lines
-                    batches = [
-                        lines[i : i + batch_size]
-                        for i in range(0, len(lines), batch_size)
-                    ]
-                    # Save each batch as a zip file into dest bucket
-                    for i, batch in enumerate(batches):
-                        with io.BytesIO() as output:
-                            with zipfile.ZipFile(
-                                output, "w", zipfile.ZIP_DEFLATED
-                            ) as zipf:
-                                for line in batch:
-                                    zipf.writestr(f"data/{i}.txt", line)
-                            output.seek(0)
-                            batch_key = f"{dataset_id}#{i}.zip"
-                            self.s3_client.put_object(
-                                Bucket=dest_bucket, Key=batch_key, Body=output.read()
-                            )
-                            logger.info(f"Batch key: {batch_key}")
-                            dataset.batch_keys.append(batch_key)
-            # Update the dataset in database
+                file_path = f"tmp/{filename}"
+                if not os.path.isfile(file_path) or not filename.endswith(
+                    (".txt", ".md")
+                ):
+                    continue
+
+                logger.info(f"Processing filename: {filename}")
+                with open(file_path, "r") as f:
+                    if filename.endswith(".txt"):
+                        # Read batch-sized lines at a time to optimize memory usage
+                        while True:
+                            batch = list(itertools.islice(f, batch_size))
+                            if not batch:
+                                break
+
+                            self._upload_batch(batch, batch_count, dest_bucket, dataset)
+                            batch_count += 1
+                    else:
+                        # For other text formats (like .md), treat the entire file as one item
+                        batch = [f.read()]
+                        self._upload_batch(batch, batch_count, dest_bucket, dataset)
+                        batch_count += 1
+
+            # Clean up extracted files
+            shutil.rmtree("tmp")
+
+            # Update the dataset in database with all batch keys
             self.datasets_table.put_item(Item=dataset.model_dump(mode="json"))
             logger.info("Dataset batched successfully")
         elif dataset.modality in (
@@ -103,3 +105,17 @@ class DatasetsRepository:
             pass
         else:
             raise ValueError(f"Unknown modality: {dataset.modality}")
+
+    def _upload_batch(self, batch, batch_idx, dest_bucket, dataset):
+        """Helper to package and upload a single batch to S3."""
+        with io.BytesIO() as output:
+            with zipfile.ZipFile(output, "w", zipfile.ZIP_DEFLATED) as zipf:
+                for line_idx, line in enumerate(batch):
+                    # Each line is stored as a separate file in the zip
+                    zipf.writestr(f"data/{line_idx}.txt", line)
+
+            output.seek(0)
+            batch_key = f"{dataset.id}#{batch_idx}.zip"
+            self.s3_client.put_object(Bucket=dest_bucket, Key=batch_key, Body=output)
+            logger.info(f"Uploaded batch: {batch_key}")
+            dataset.batch_keys.append(batch_key)
