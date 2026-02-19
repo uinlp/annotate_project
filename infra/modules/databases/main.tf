@@ -82,7 +82,7 @@ module "datasets_temp_bucket" {
   object_ownership         = "ObjectWriter"
 }
 
-module "publishes_bucket" {
+module "assets_publishes_bucket" {
   source = "terraform-aws-modules/s3-bucket/aws"
 
   bucket_prefix = "uinlp-assets-publishes"
