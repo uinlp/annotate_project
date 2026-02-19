@@ -59,6 +59,7 @@ class DatasetsRepository:
             zip_ref.extractall("/tmp/datasets")
         del data
         dataset = self.get_dataset(object_key.split(".")[0])
+        dataset.batch_keys = []  # Reset the list to avoid duplication
         batch_size = dataset.batch_size
         dest_bucket = os.environ["DATASETS_OBJECTS_BUCKET_NAME"]
         # Parse the dataset according to its modality
