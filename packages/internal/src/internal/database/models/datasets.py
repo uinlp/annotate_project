@@ -24,13 +24,21 @@ class DatasetCreateModel(BaseModel):
     description: str
     modality: ModalityTypeEnum
     batch_size: int
-    created_at: datetime = Field(default_factory=datetime.now)
-    updated_at: datetime = Field(default_factory=datetime.now)
 
     @computed_field
     @property
     def id(self) -> str:
         return self.name.lower().replace(" ", "-")
+
+    @computed_field
+    @property
+    def created_at(self) -> datetime:
+        return datetime.now()
+
+    @computed_field
+    @property
+    def updated_at(self) -> datetime:
+        return datetime.now()
 
 
 class DatasetUploadModel(BaseModel):
