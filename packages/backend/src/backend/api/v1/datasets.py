@@ -32,8 +32,8 @@ def get_dataset(dataset_id: Annotated[str, Path()]) -> DatasetModel:
     return datasets_repository.get_dataset(dataset_id)
 
 
-@router.get("/batch-download-url")
-def get_batch_download_url(
+@router.post("/batch-download-url")
+def create_batch_download_url(
     body: DatasetBatchDownloadCreateModel,
 ) -> DatasetBatchDownloadModel:
-    return datasets_repository.get_batch_download_url(body)
+    return datasets_repository.create_batch_download_url(body)
