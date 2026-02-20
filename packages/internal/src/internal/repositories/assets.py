@@ -37,6 +37,7 @@ class AssetsRepository:
                 Item=AssetModel(
                     **{
                         **asset.model_dump(mode="json"),
+                        "modality": dataset.modality,
                         "dataset_batch_key": batch_key,
                         "id": f"{asset.id}#{key_num}",
                         "name": f"{asset.name} #{key_num}",

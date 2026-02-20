@@ -1,7 +1,7 @@
 from pydantic import BaseModel, computed_field, Field
 from datetime import datetime
 
-from .shared import ModalityTypeEnum, TaskTypeEnum
+from .shared import ModalityTypeEnum
 
 
 class AnnotateFieldModel(BaseModel):
@@ -14,7 +14,7 @@ class AssetModel(BaseModel):
     id: str
     dataset_id: str
     dataset_batch_key: str
-    task_type: TaskTypeEnum
+    modality: ModalityTypeEnum
     name: str
     description: str
     created_at: datetime
@@ -26,7 +26,6 @@ class AssetModel(BaseModel):
 
 class AssetCreateModel(BaseModel):
     dataset_id: str
-    task_type: TaskTypeEnum
     name: str
     description: str
     annotate_fields: list[AnnotateFieldModel]
