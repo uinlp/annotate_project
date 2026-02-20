@@ -49,3 +49,12 @@ class AssetCreateModel(BaseModel):
 
 class AssetPublishModel(BaseModel):
     url: str
+
+
+class AssetPublishCreateModel(BaseModel):
+    asset_id: str
+    publisher_id: str
+
+
+class AssetPublishBodyModel(BaseModel):
+    asset_id: str

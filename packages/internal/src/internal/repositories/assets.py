@@ -2,6 +2,7 @@ from internal.database.models.assets import (
     AssetModel,
     AssetCreateModel,
     AssetPublishModel,
+    AssetPublishCreateModel,
 )
 from .datasets import DatasetsRepository
 import os
@@ -32,33 +33,33 @@ class AssetsRepository:
         dataset = dr.get_dataset(asset.dataset_id)
         # Create one asset for each dataset batch
         for batch_key in dataset.batch_keys:
-            key_num = batch_key.split("#")[1].split(".")[0]
+            key_num = batch_key.split("/")[1].split(".")[0]
             self.assets_table.put_item(
                 Item=AssetModel(
                     **{
                         **asset.model_dump(mode="json"),
                         "modality": dataset.modality,
                         "dataset_batch_key": batch_key,
-                        "id": f"{asset.id}#{key_num}",
+                        "id": f"{asset.id}-{key_num}",
                         "name": f"{asset.name} #{key_num}",
                     }
                 ).model_dump(mode="json")
             )
 
-    def get_publish_url(self, asset_id, publisher_id):
+    def create_publish_url(self, model: AssetPublishCreateModel):
         bucket = os.environ["ASSETS_PUBLISHES_BUCKET_NAME"]
         url = self.s3_client.generate_presigned_url(
             "put_object",
             Params={
                 "Bucket": bucket,
-                "Key": f"{asset_id}@{publisher_id}.zip",
+                "Key": f"{model.asset_id}/{model.publisher_id}.zip",
             },
             ExpiresIn=3600,
         )
         return AssetPublishModel(url=url)
 
-    def published(self, asset_id, publisher_id):
-        asset = self.get_asset(asset_id)
-        asset.publishers.append(publisher_id)
+    def published(self, model: AssetPublishCreateModel):
+        asset = self.get_asset(model.asset_id)
+        asset.publishers.append(model.publisher_id)
         self.assets_table.put_item(Item=asset.model_dump(mode="json"))
         # Update publisher's publish_count

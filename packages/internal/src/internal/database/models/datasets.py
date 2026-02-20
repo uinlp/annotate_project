@@ -39,3 +39,7 @@ class DatasetUploadModel(BaseModel):
 
 class DatasetBatchDownloadModel(BaseModel):
     url: str
+
+
+class DatasetBatchDownloadCreateModel(BaseModel):
+    batch_key: str

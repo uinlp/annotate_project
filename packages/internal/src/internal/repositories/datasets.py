@@ -4,6 +4,7 @@ from internal.database.models.datasets import (
     DatasetUploadModel,
     ModalityTypeEnum,
     DatasetBatchDownloadModel,
+    DatasetBatchDownloadCreateModel,
 )
 import os
 import boto3
@@ -120,18 +121,18 @@ class DatasetsRepository:
                     zipf.writestr(f"data/{line_idx + 1}.txt", line)
 
             output.seek(0)
-            batch_key = f"{dataset.id}#{batch_idx}.zip"
+            batch_key = f"{dataset.id}/{batch_idx}.zip"
             self.s3_client.put_object(Bucket=dest_bucket, Key=batch_key, Body=output)
             logger.info(f"Uploaded batch: {batch_key}")
             dataset.batch_keys.append(batch_key)
 
-    def get_batch_download_url(self, batch_key):
+    def create_batch_download_url(self, model: DatasetBatchDownloadCreateModel):
         dataset_objects_bucket = os.environ["DATASETS_OBJECTS_BUCKET_NAME"]
         url = self.s3_client.generate_presigned_url(
             "get_object",
             Params={
                 "Bucket": dataset_objects_bucket,
-                "Key": batch_key,
+                "Key": model.batch_key,
             },
             ExpiresIn=3600,
         )
