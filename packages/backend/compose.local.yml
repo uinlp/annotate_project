@@ -8,5 +8,6 @@ services:
       - "8001:8000"
     volumes:
       - ./src/backend/:/var/task
+      - ../internal/src/internal:/var/task/internal
     env_file:
       - .env.local

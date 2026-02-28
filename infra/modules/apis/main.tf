@@ -130,6 +130,51 @@ resource "aws_iam_role_policy" "role_policy" {
   })
 }
 
+#====================================
+# Cognito User Pool
+#====================================
+resource "aws_cognito_user_pool" "user_pool" {
+  name = "uinlp-user-pool"
+
+  schema {
+    name                = "name"
+    required            = true
+    attribute_data_type = "String"
+    string_attribute_constraints {
+      min_length = 0
+      max_length = 256
+    }
+  }
+  schema {
+    name                = "email"
+    required            = true
+    attribute_data_type = "String"
+    string_attribute_constraints {
+      min_length = 0
+      max_length = 256
+    }
+  }
+  username_attributes = ["email"]
+
+}
+
+resource "aws_cognito_user_pool_client" "client" {
+  name                                 = "uinlp-user-pool-client"
+  user_pool_id                         = aws_cognito_user_pool.user_pool.id
+  allowed_oauth_flows_user_pool_client = true
+  callback_urls                        = ["https://api.uinlp.org.ng/oauth2/callback"]
+  logout_urls                          = ["https://api.uinlp.org.ng/oauth2/logout"]
+  allowed_oauth_flows                  = ["code", "implicit"]
+  allowed_oauth_scopes                 = ["email", "openid", "profile"]
+  supported_identity_providers         = ["COGNITO"]
+}
+
+resource "aws_cognito_managed_login_branding" "client" {
+  client_id    = aws_cognito_user_pool_client.client.id
+  user_pool_id = aws_cognito_user_pool.user_pool.id
+
+  use_cognito_provided_values = true
+}
 # ===================================
 # API Gateway: UINLP REST API
 # ===================================
@@ -150,6 +195,20 @@ module "api_gateway" {
   create_stage       = true
   stage_name         = "$default"
   deploy_stage       = true
+
+  domain_name                 = "api.uinlp.org.ng"
+  domain_name_certificate_arn = "arn:aws:acm:us-east-1:824271108796:certificate/2f1a1416-d97d-43ab-8aaa-7021b24af0c5"
+
+  authorizers = {
+    "cognito" = {
+      authorizer_type  = "JWT"
+      identity_sources = ["$request.header.Authorization"]
+      jwt_configuration = {
+        audience = [aws_cognito_user_pool_client.client.id]
+        issuer   = "https://${aws_cognito_user_pool.user_pool.endpoint}"
+      }
+    }
+  }
 
   routes = {
     "$default" = {
