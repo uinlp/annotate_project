@@ -235,6 +235,7 @@ data "aws_acm_certificate" "uinlp_certificate" {
   # provider    = aws.us_east_1
   domain      = "*.uinlp.org.ng"
   most_recent = true
+  region      = "us-east-1"
 }
 
 # Grant API Gateway permission to invoke Lambda
