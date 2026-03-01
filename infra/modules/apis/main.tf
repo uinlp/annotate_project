@@ -4,6 +4,10 @@ terraform {
       source  = "kreuzwerker/docker"
       version = "~> 3.0"
     }
+    # aws = {
+    #   source                = "hashicorp/aws"
+    #   configuration_aliases = [aws.us_east_1]
+    # }
   }
 }
 
@@ -228,9 +232,11 @@ module "api_gateway" {
 }
 
 data "aws_acm_certificate" "uinlp_certificate" {
+  # provider    = aws.us_east_1
   domain      = "uinlp.org.ng"
   most_recent = true
   statuses    = ["ISSUED"]
+  region      = "us-east-1"
 }
 
 # Grant API Gateway permission to invoke Lambda
