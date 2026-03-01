@@ -235,7 +235,7 @@ data "aws_acm_certificate" "uinlp_certificate" {
   # provider    = aws.us_east_1
   domain      = "uinlp.org.ng"
   most_recent = true
-  statuses    = ["ISSUED"]
+  types       = ["AMAZON_ISSUED"]
   region      = "us-east-1"
 }
 
