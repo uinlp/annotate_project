@@ -176,6 +176,11 @@ resource "aws_cognito_managed_login_branding" "client" {
 
   use_cognito_provided_values = true
 }
+resource "aws_cognito_user_pool_domain" "user_pool_domain" {
+  user_pool_id    = aws_cognito_user_pool.user_pool.id
+  domain          = "api.uinlp.org.ng"
+  certificate_arn = data.aws_acm_certificate.uinlp_certificate.arn
+}
 # ===================================
 # API Gateway: UINLP REST API
 # ===================================
