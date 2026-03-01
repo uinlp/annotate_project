@@ -5,7 +5,7 @@ services:
       dockerfile: backend/Dockerfile.local
     container_name: uinlp_backend_local
     ports:
-      - "8001:8000"
+      - "3000:8000"
     volumes:
       - ./src/backend/:/var/task
       - ../internal/src/internal:/var/task/internal

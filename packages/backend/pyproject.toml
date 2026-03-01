@@ -18,6 +18,7 @@ dependencies = [
   "mangum",
   "aws-lambda-powertools",
   "internal @ file:../internal",
+  "itsdangerous",
 ]
 
 [tool.hatch.envs.types]

@@ -1,5 +1,0 @@
-fastapi[standard]
-mangum
-aws-lambda-powertools
-pydantic
-itsdangerous
