@@ -162,8 +162,9 @@ resource "aws_cognito_user_pool_client" "client" {
   name                                 = "uinlp-user-pool-client"
   user_pool_id                         = aws_cognito_user_pool.user_pool.id
   allowed_oauth_flows_user_pool_client = true
-  callback_urls                        = ["https://api.uinlp.org.ng/oauth2/callback"]
-  logout_urls                          = ["https://api.uinlp.org.ng/oauth2/logout"]
+  callback_urls                        = ["https://api.uinlp.org.ng/oauth2/callback", "http://localhost:3000/oauth2/callback"]
+  logout_urls                          = ["https://api.uinlp.org.ng/oauth2/logout", "http://localhost:3000/oauth2/logout"]
+  default_redirect_uri                 = "https://api.uinlp.org.ng/oauth2/callback"
   allowed_oauth_flows                  = ["code", "implicit"]
   allowed_oauth_scopes                 = ["email", "openid", "profile"]
   supported_identity_providers         = ["COGNITO"]
@@ -198,7 +199,7 @@ module "api_gateway" {
 
   hosted_zone_name            = "uinlp.org.ng"
   domain_name                 = "api.uinlp.org.ng"
-  domain_name_certificate_arn = "arn:aws:acm:us-east-1:824271108796:certificate/2f1a1416-d97d-43ab-8aaa-7021b24af0c5"
+  domain_name_certificate_arn = data.aws_acm_certificate.uinlp_certificate.arn
 
   authorizers = {
     "cognito" = {
@@ -219,6 +220,12 @@ module "api_gateway" {
       }
     }
   }
+}
+
+data "aws_acm_certificate" "uinlp_certificate" {
+  domain      = "api.uinlp.org.ng"
+  most_recent = true
+  statuses    = ["ISSUED"]
 }
 
 # Grant API Gateway permission to invoke Lambda
