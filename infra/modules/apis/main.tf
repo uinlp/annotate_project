@@ -191,11 +191,12 @@ module "api_gateway" {
     allow_origins = ["*"]
   }
 
-  create_domain_name = false
+  create_domain_name = true
   create_stage       = true
   stage_name         = "$default"
   deploy_stage       = true
 
+  hosted_zone_name            = "uinlp.org.ng"
   domain_name                 = "api.uinlp.org.ng"
   domain_name_certificate_arn = "arn:aws:acm:us-east-1:824271108796:certificate/2f1a1416-d97d-43ab-8aaa-7021b24af0c5"
 
