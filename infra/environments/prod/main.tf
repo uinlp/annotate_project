@@ -1,11 +1,11 @@
 provider "aws" {
-  # region = "af-south-1"
+  region = "af-south-1"
 }
 
-# provider "aws" {
-#   alias  = "us_east_1"
-#   region = "us-east-1"
-# }
+provider "aws" {
+  alias  = "us_east_1"
+  region = "us-east-1"
+}
 
 module "databases" {
   source = "../../modules/databases"
@@ -14,9 +14,9 @@ module "databases" {
 module "apis" {
   source = "../../modules/apis"
 
-  # providers = {
-  #   aws.us_east_1 = aws.us_east_1
-  # }
+  providers = {
+    aws.us_east_1 = aws.us_east_1
+  }
 
   datasets_table_name          = module.databases.uinlp_datasets_table_name
   assets_table_name            = module.databases.uinlp_assets_table_name
