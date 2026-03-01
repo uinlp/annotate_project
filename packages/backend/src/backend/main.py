@@ -14,10 +14,8 @@ app = FastAPI(
         "appName": "UINLP",
         "usePkceWithAuthorizationCodeGrant": True,
         "scopes": ["openid", "profile", "email"],
-        "additionalQueryStringParams": {
-            "redirect_uri": COGNITO_REDIRECT_URI,
-        },
-    }
+    },
+    swagger_ui_oauth2_redirect_url=COGNITO_REDIRECT_URI,
 )
 
 # Include API routers
