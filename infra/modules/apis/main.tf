@@ -181,8 +181,9 @@ resource "aws_cognito_managed_login_branding" "client" {
   use_cognito_provided_values = true
 }
 resource "aws_cognito_user_pool_domain" "user_pool_domain" {
-  user_pool_id = aws_cognito_user_pool.user_pool.id
-  domain       = "uinlp-auth"
+  user_pool_id          = aws_cognito_user_pool.user_pool.id
+  domain                = "uinlp-auth"
+  managed_login_version = 2
 }
 # ===================================
 # API Gateway: UINLP REST API
