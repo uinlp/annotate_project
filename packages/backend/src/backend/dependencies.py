@@ -1,10 +1,10 @@
 from fastapi import Depends
 from fastapi.security import OAuth2AuthorizationCodeBearer
-from .settings import AUTHORIZATION_URL, TOKEN_URL
+from settings import COGNITO_AUTHORIZATION_URL, COGNITO_TOKEN_URL
 
 oauth2_scheme = OAuth2AuthorizationCodeBearer(
-    authorizationUrl=AUTHORIZATION_URL,
-    tokenUrl=TOKEN_URL,
+    authorizationUrl=COGNITO_AUTHORIZATION_URL,
+    tokenUrl=COGNITO_TOKEN_URL,
     scopes={
         "openid": "OpenID Connect",
         "profile": "Profile",

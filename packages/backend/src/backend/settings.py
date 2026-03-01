@@ -1,8 +1,10 @@
 import os
 
-
+# General
 SECRET_KEY = os.getenv("SECRET_KEY")
-AUTHORIZATION_URL = os.getenv("AUTHORIZATION_URL")
-TOKEN_URL = os.getenv("TOKEN_URL")
-CLIENT_ID = os.getenv("CLIENT_ID")
-CLIENT_SECRET = os.getenv("CLIENT_SECRET")
+
+# AWS Cognito
+COGNITO_CLIENT_ID = os.getenv("COGNITO_CLIENT_ID")
+COGNITO_DOMAIN = os.getenv("COGNITO_DOMAIN")
+COGNITO_AUTHORIZATION_URL = f"https://{COGNITO_DOMAIN}/oauth2/authorize"
+COGNITO_TOKEN_URL = f"https://{COGNITO_DOMAIN}/oauth2/token"

@@ -4,10 +4,6 @@ terraform {
       source  = "kreuzwerker/docker"
       version = "~> 3.0"
     }
-    # aws = {
-    #   source                = "hashicorp/aws"
-    #   configuration_aliases = [aws.us_east_1]
-    # }
   }
 }
 
@@ -79,6 +75,10 @@ module "lambda_function" {
     DATASETS_OBJECTS_BUCKET_NAME = var.datasets_objects_bucket_name
     DATASETS_TEMP_BUCKET_NAME    = var.datasets_temp_bucket_name
     ASSETS_PUBLISHES_BUCKET_NAME = var.assets_publishes_bucket_name
+    COGNITO_DOMAIN               = "uinlp-auth.auth.af-south-1.amazoncognito.com"
+    COGNITO_CLIENT_ID            = aws_cognito_user_pool_client.client.id
+    SECRET_KEY                   = "secret-key-1234567890"
+    COGNITO_AUTHORITY            = "https://cognito-idp.af-south-1.amazonaws.com/af-south-1_0CMFymkM5"
   }
 
   # Standard Lambda configurations
@@ -181,9 +181,8 @@ resource "aws_cognito_managed_login_branding" "client" {
   use_cognito_provided_values = true
 }
 resource "aws_cognito_user_pool_domain" "user_pool_domain" {
-  user_pool_id    = aws_cognito_user_pool.user_pool.id
-  domain          = "api.uinlp.org.ng"
-  certificate_arn = data.aws_acm_certificate.uinlp_certificate.arn
+  user_pool_id = aws_cognito_user_pool.user_pool.id
+  domain       = "uinlp-auth"
 }
 # ===================================
 # API Gateway: UINLP REST API
@@ -232,7 +231,6 @@ module "api_gateway" {
 }
 
 data "aws_acm_certificate" "uinlp_certificate" {
-  # provider    = aws.us_east_1
   domain      = "*.uinlp.org.ng"
   most_recent = true
   region      = "us-east-1"
