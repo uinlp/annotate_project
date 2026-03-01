@@ -3,7 +3,7 @@ from api.v1 import router as v1_router
 from mangum import Mangum
 from aws_lambda_powertools.logging import Logger
 from starlette.middleware.sessions import SessionMiddleware
-from settings import SECRET_KEY, COGNITO_CLIENT_ID
+from settings import SECRET_KEY, COGNITO_CLIENT_ID, COGNITO_REDIRECT_URI
 from dependencies import is_authenticated
 
 logger = Logger()
@@ -14,6 +14,9 @@ app = FastAPI(
         "appName": "UINLP",
         "usePkceWithAuthorizationCodeGrant": True,
         "scopes": ["openid", "profile", "email"],
+        "additionalQueryStringParams": {
+            "redirect_uri": COGNITO_REDIRECT_URI,
+        },
     }
 )
 

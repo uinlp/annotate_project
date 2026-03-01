@@ -79,6 +79,8 @@ module "lambda_function" {
     COGNITO_CLIENT_ID            = aws_cognito_user_pool_client.client.id
     SECRET_KEY                   = "secret-key-1234567890"
     COGNITO_AUTHORITY            = "https://cognito-idp.af-south-1.amazonaws.com/af-south-1_0CMFymkM5"
+    COGNITO_REDIRECT_URI         = "https://api.uinlp.org.ng/oauth2/callback"
+    COGNITO_LOGOUT_URI           = "https://api.uinlp.org.ng/oauth2/logout"
   }
 
   # Standard Lambda configurations
