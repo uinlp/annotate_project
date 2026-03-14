@@ -79,8 +79,8 @@ module "lambda_function" {
     COGNITO_CLIENT_ID            = aws_cognito_user_pool_client.client.id
     SECRET_KEY                   = "secret-key-1234567890"
     COGNITO_AUTHORITY            = "https://cognito-idp.af-south-1.amazonaws.com/af-south-1_0CMFymkM5"
-    COGNITO_REDIRECT_URI         = "https://api.uinlp.org.ng/oauth2/callback"
-    COGNITO_LOGOUT_URI           = "https://api.uinlp.org.ng/oauth2/logout"
+    COGNITO_REDIRECT_URI         = "/oauth2/callback"
+    COGNITO_LOGOUT_URI           = "/oauth2/logout"
   }
 
   # Standard Lambda configurations
@@ -140,7 +140,19 @@ resource "aws_iam_role_policy" "role_policy" {
 # Cognito User Pool
 #====================================
 resource "aws_cognito_user_pool" "user_pool" {
-  name = "uinlp-user-pool"
+  name                     = "uinlp-user-pool"
+  auto_verified_attributes = ["email"]
+  email_configuration {
+    email_sending_account = "COGNITO_DEFAULT"
+  }
+  password_policy {
+    minimum_length    = 8
+    require_lowercase = true
+    require_uppercase = true
+    require_numbers   = true
+    require_symbols   = true
+  }
+
 
   schema {
     name                = "name"
