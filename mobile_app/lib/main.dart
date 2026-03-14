@@ -1,12 +1,33 @@
+import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
+import 'package:amplify_authenticator/amplify_authenticator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:uinlp_annotate/features/annotate_task/bloc/annotate_task_bloc.dart';
 import 'package:uinlp_annotate/utilities/router.dart';
 import 'package:uinlp_annotate/utilities/theme.dart';
 import 'package:uinlp_annotate_repository/uinlp_annotate_repository.dart';
+import 'package:amplify_flutter/amplify_flutter.dart';
 
-void main() {
-  runApp(const MainApp());
+import 'amplify_outputs.dart';
+
+void main() async {
+  try {
+    WidgetsFlutterBinding.ensureInitialized();
+    await _configureAmplify();
+    runApp(const MainApp());
+  } on AmplifyException catch (e) {
+    runApp(Text("Error configuring Amplify: ${e.message}"));
+  }
+}
+
+Future<void> _configureAmplify() async {
+  try {
+    await Amplify.addPlugin(AmplifyAuthCognito());
+    await Amplify.configure(amplifyConfig);
+    safePrint('Successfully configured');
+  } on Exception catch (e) {
+    safePrint('Error configuring Amplify: $e');
+  }
 }
 
 class MainApp extends StatelessWidget {
@@ -31,25 +52,28 @@ class MainApp extends StatelessWidget {
             ),
           ),
         ],
-        child: MaterialApp.router(
-          title: 'UINLP Annotate',
-          theme: appLightTheme,
-          darkTheme: appDarkTheme,
-          themeMode: ThemeMode.system,
-          routerConfig: appRouter,
-          // builder: (context, child) {
-          //   print("Initializing repositories");
-          //   return FutureBuilder(
-          //     key: ValueKey("123"),
-          //     future: context.read<UinlpAnnotateRepository>().init(),
-          //     builder: (context, asyncSnapshot) {
-          //       if (asyncSnapshot.connectionState != ConnectionState.done) {
-          //         return const Center(child: CircularProgressIndicator());
-          //       }
-          //       return child ?? const SizedBox.shrink();
-          //     },
-          //   );
-          // },
+        child: Authenticator(
+          child: MaterialApp.router(
+            title: 'UINLP Annotate',
+            theme: appLightTheme,
+            darkTheme: appDarkTheme,
+            themeMode: ThemeMode.system,
+            routerConfig: appRouter,
+            builder: Authenticator.builder(),
+            // builder: (context, child) {
+            //   print("Initializing repositories");
+            //   return FutureBuilder(
+            //     key: ValueKey("123"),
+            //     future: context.read<UinlpAnnotateRepository>().init(),
+            //     builder: (context, asyncSnapshot) {
+            //       if (asyncSnapshot.connectionState != ConnectionState.done) {
+            //         return const Center(child: CircularProgressIndicator());
+            //       }
+            //       return child ?? const SizedBox.shrink();
+            //     },
+            //   );
+            // },
+          ),
         ),
       ),
     );

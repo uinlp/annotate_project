@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -112,24 +113,32 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Widget _buildWelcomeSection(ThemeData theme) {
-    return Text.rich(
-      TextSpan(
-        children: [
-          TextSpan(text: "Hi, ", style: theme.textTheme.headlineSmall),
+    return FutureBuilder(
+      future: Amplify.Auth.getCurrentUser(),
+      builder: (context, asyncSnapshot) {
+        if (!asyncSnapshot.hasData) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        return Text.rich(
           TextSpan(
-            text: "User",
-            style: theme.textTheme.headlineSmall?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
+            children: [
+              TextSpan(text: "Hi, ", style: theme.textTheme.headlineSmall),
+              TextSpan(
+                text: asyncSnapshot.data?.userId,
+                style: theme.textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              TextSpan(
+                text: "\nLet's clear some tasks today!",
+                style: theme.textTheme.bodyLarge?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ],
           ),
-          TextSpan(
-            text: "\nLet's clear some tasks today!",
-            style: theme.textTheme.bodyLarge?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 

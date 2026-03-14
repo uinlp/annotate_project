@@ -142,6 +142,11 @@ resource "aws_iam_role_policy" "role_policy" {
 resource "aws_cognito_user_pool" "user_pool" {
   name                     = "uinlp-user-pool"
   auto_verified_attributes = ["email"]
+  alias_attributes         = ["email", "preferred_username"]
+
+  username_configuration {
+    case_sensitive = false
+  }
   email_configuration {
     email_sending_account = "COGNITO_DEFAULT"
   }
@@ -152,17 +157,6 @@ resource "aws_cognito_user_pool" "user_pool" {
     require_numbers   = true
     require_symbols   = true
   }
-
-
-  schema {
-    name                = "name"
-    required            = true
-    attribute_data_type = "String"
-    string_attribute_constraints {
-      min_length = 0
-      max_length = 256
-    }
-  }
   schema {
     name                = "email"
     required            = true
@@ -172,8 +166,6 @@ resource "aws_cognito_user_pool" "user_pool" {
       max_length = 256
     }
   }
-  username_attributes = ["email"]
-
 }
 
 resource "aws_cognito_user_pool_client" "client" {
