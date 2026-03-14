@@ -1,0 +1,2 @@
+types-boto3[full]
+requests

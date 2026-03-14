@@ -1,6 +1,6 @@
 from fastapi import Depends
 from fastapi.security import OAuth2AuthorizationCodeBearer
-from settings import COGNITO_AUTHORIZATION_URL, COGNITO_TOKEN_URL
+from backend.settings import COGNITO_AUTHORIZATION_URL, COGNITO_TOKEN_URL
 
 oauth2_scheme = OAuth2AuthorizationCodeBearer(
     authorizationUrl=COGNITO_AUTHORIZATION_URL,

@@ -1,0 +1,6 @@
+fastapi[standard]
+mangum
+aws-lambda-powertools
+itsdangerous
+pydantic
+boto3
