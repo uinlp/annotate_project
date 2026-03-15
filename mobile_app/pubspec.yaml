@@ -43,6 +43,10 @@ dependencies:
   dio: ^5.9.2
   path_provider: ^2.1.5
   archive: ^4.0.9
+  record: ^6.2.0
+  audioplayers: ^6.6.0
+  image_picker: ^1.2.1
+  video_player: ^2.11.1
 
 dev_dependencies:
   flutter_test:
