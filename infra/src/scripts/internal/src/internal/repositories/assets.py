@@ -7,6 +7,7 @@ from internal.database.models.assets import (
 from .datasets import DatasetsRepository
 import os
 import boto3
+from boto3.dynamodb.conditions import Key
 
 
 class AssetsRepository:
@@ -19,8 +20,14 @@ class AssetsRepository:
         )
         self.assets_table = self.dynamodb.Table(assets_table_name)
 
-    def list_assets(self) -> list[AssetModel]:
-        response = self.assets_table.scan()
+    def list_assets(self, modality: str | None = None) -> list[AssetModel]:
+        if modality:
+            response = self.assets_table.query(
+                IndexName="modality-index",
+                KeyConditionExpression=Key("modality").eq(modality),
+            )
+        else:
+            response = self.assets_table.scan()
         items = response["Items"]
         return [AssetModel(**item) for item in items]
 

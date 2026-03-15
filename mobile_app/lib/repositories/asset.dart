@@ -8,9 +8,16 @@ final class AssetRepository extends BaseRepository {
   Future<List<AnnotateAssetModel>> getRecentAssets({
     int limit = 10,
     int offset = 0,
-    TaskTypeEnum? type,
+    AnnotateModalityEnum? modality,
   }) async {
-    final response = await client.get("assets/");
+    final response = await client.get(
+      "assets/",
+      queryParameters: {
+        "limit": limit,
+        "offset": offset,
+        if (modality != null) "modality": modality.repr,
+      },
+    );
     debugPrint("Assets: ${response.data.toString()}");
     return (response.data as List)
         .map((e) => AnnotateAssetModel.fromJson(e))
