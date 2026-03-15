@@ -16,7 +16,7 @@ provider "docker" {
     address  = data.aws_ecr_authorization_token.token.proxy_endpoint
   }
 }
-
+data "aws_region" "current" {}
 # ===================================
 # Docker Build: UINLP Backend
 # ===================================
@@ -75,10 +75,10 @@ module "lambda_function" {
     DATASETS_OBJECTS_BUCKET_NAME = var.datasets_objects_bucket_name
     DATASETS_TEMP_BUCKET_NAME    = var.datasets_temp_bucket_name
     ASSETS_PUBLISHES_BUCKET_NAME = var.assets_publishes_bucket_name
-    COGNITO_DOMAIN               = "https://uinlp-auth.auth.af-south-1.amazoncognito.com"
+    COGNITO_DOMAIN               = "https://${aws_cognito_user_pool_domain.user_pool_domain.domain}.auth.${data.aws_region.current.name}.amazoncognito.com"
     COGNITO_CLIENT_ID            = aws_cognito_user_pool_client.client.id
     SECRET_KEY                   = "secret-key-1234567890"
-    COGNITO_AUTHORITY            = "https://cognito-idp.af-south-1.amazonaws.com/af-south-1_0CMFymkM5"
+    COGNITO_AUTHORITY            = "https://${aws_cognito_user_pool.user_pool.endpoint}"
     COGNITO_REDIRECT_URI         = "/oauth2/callback"
     COGNITO_LOGOUT_URI           = "/oauth2/logout"
   }
