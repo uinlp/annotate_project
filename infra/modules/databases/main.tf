@@ -50,6 +50,18 @@ module "uinlp_assets" {
     {
       name = "id"
       type = "S"
+    },
+    {
+      name = "modality"
+      type = "S"
+    }
+  ]
+
+  global_secondary_indexes = [
+    {
+      name            = "modality-index"
+      hash_key        = "modality"
+      projection_type = "ALL"
     }
   ]
 
