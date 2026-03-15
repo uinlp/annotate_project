@@ -74,19 +74,6 @@ class MainApp extends StatelessWidget {
             themeMode: ThemeMode.system,
             routerConfig: appRouter,
             builder: Authenticator.builder(),
-            // builder: (context, child) {
-            //   print("Initializing repositories");
-            //   return FutureBuilder(
-            //     key: ValueKey("123"),
-            //     future: context.read<UinlpAnnotateRepository>().init(),
-            //     builder: (context, asyncSnapshot) {
-            //       if (asyncSnapshot.connectionState != ConnectionState.done) {
-            //         return const Center(child: CircularProgressIndicator());
-            //       }
-            //       return child ?? const SizedBox.shrink();
-            //     },
-            //   );
-            // },
           ),
         ),
       ),

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:uinlp_annotate/components/fields.dart';
 import 'package:uinlp_annotate/features/annotate_task/bloc/annotate_task_bloc.dart';
 import 'package:uinlp_annotate/features/main/screens/dashboard_screen.dart';
 import 'package:uinlp_annotate/models/annotate_task.dart';
@@ -230,31 +231,46 @@ class _AnnotateEditorScreenState extends State<AnnotateEditorScreen> {
                 },
               ),
               for (var field in fields)
-                // Text(field.name),
                 switch (field.modality) {
-                  AnnotateModalityEnum.text => CustomTextField(
+                  // TEXT MODALITY
+                  AnnotateModalityEnum.text => AnnotateTextField(
                     key: ValueKey(field.name),
                     field: field,
                     theme: theme,
                   ),
-                  _ => Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.surfaceContainer,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: theme.colorScheme.outlineVariant,
-                      ),
-                    ),
-                    child: Row(
-                      children: [
-                        Text(
-                          "${field.modality.repr} Field (#TODO)",
-                          style: theme.textTheme.bodyLarge,
-                        ),
-                      ],
-                    ),
+                  // AUDIO MODALITY
+                  AnnotateModalityEnum.audio => AnnotateAudioField(
+                    key: ValueKey(field.name),
+                    field: field,
                   ),
+                  // IMAGE MODALITY
+                  AnnotateModalityEnum.image => AnnotateImageField(
+                    key: ValueKey(field.name),
+                    field: field,
+                  ),
+                  // VIDEO MODALITY
+                  AnnotateModalityEnum.video => AnnotateVideoField(
+                    key: ValueKey(field.name),
+                    field: field,
+                  ),
+                  // _ => Container(
+                  //   padding: const EdgeInsets.all(16),
+                  //   decoration: BoxDecoration(
+                  //     color: theme.colorScheme.surfaceContainer,
+                  //     borderRadius: BorderRadius.circular(12),
+                  //     border: Border.all(
+                  //       color: theme.colorScheme.outlineVariant,
+                  //     ),
+                  //   ),
+                  //   child: Row(
+                  //     children: [
+                  //       Text(
+                  //         "${field.modality.repr} Field (#TODO)",
+                  //         style: theme.textTheme.bodyLarge,
+                  //       ),
+                  //     ],
+                  //   ),
+                  // ),
                 },
             ],
           ),
@@ -369,68 +385,6 @@ class _AnnotateEditorScreenState extends State<AnnotateEditorScreen> {
         ),
       ),
       endDrawer: AnnotateEditorEndDrawer(taskId: taskId),
-    );
-  }
-}
-
-class CustomTextField extends StatefulWidget {
-  const CustomTextField({super.key, required this.field, required this.theme});
-
-  final AnnotateFieldStateModel field;
-  final ThemeData theme;
-
-  @override
-  State<CustomTextField> createState() => _CustomTextFieldState();
-}
-
-class _CustomTextFieldState extends State<CustomTextField> {
-  late final TextEditingController controller;
-
-  @override
-  void initState() {
-    super.initState();
-    controller = TextEditingController(text: widget.field.value.value);
-    widget.field.value.addListener(() {
-      setState(() {
-        controller.text = widget.field.value.value ?? "";
-      });
-    });
-  }
-
-  @override
-  void dispose() {
-    controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return TextFormField(
-      controller: controller,
-      onSaved: (value) {
-        if (value != null && value.isNotEmpty) {
-          widget.field.value.value = value;
-        } else {
-          widget.field.value.value = null;
-        }
-      },
-      decoration: InputDecoration(
-        labelText: widget.field.name.toTitleCase(),
-        hintText: widget.field.description,
-        suffixIcon: ValueListenableBuilder(
-          valueListenable: controller,
-          builder: (context, value, child) {
-            return Icon(
-              Icons.check_circle,
-              color: widget.field.value.value == value.text
-                  ? widget.theme.colorScheme.primary
-                  : value.text.isNotEmpty
-                  ? Colors.orange
-                  : widget.theme.colorScheme.outline,
-            );
-          },
-        ),
-      ),
     );
   }
 }

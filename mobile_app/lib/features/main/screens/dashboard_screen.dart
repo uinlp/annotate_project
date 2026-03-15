@@ -206,41 +206,41 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Widget _buildActionGrid(BuildContext context, ThemeData theme) {
-    return GridView.extent(
+    return ListView(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       // crossAxisCount: 2,
-      maxCrossAxisExtent: 200,
-      mainAxisSpacing: 16,
-      crossAxisSpacing: 16,
-      childAspectRatio: 1.1,
+      // maxCrossAxisExtent: 300,
+      // mainAxisSpacing: 16,
+      // crossAxisSpacing: 16,
+      // childAspectRatio: 1.1,
       children: [
         _buildActionCard(
           context,
           theme,
           "Image Assets",
-          "Image to all other modalities",
+          "Work with provided images and follow the instructions to create outputs like descriptions, audio narration, or video prompts.",
           AnnotateModalityEnum.image,
         ),
         _buildActionCard(
           context,
           theme,
           "Text Assets",
-          "Text to all other modalities",
+          "Use the provided text to generate related outputs such as images, audio narration, or video concepts based on the task instructions.",
           AnnotateModalityEnum.text,
         ),
         _buildActionCard(
           context,
           theme,
           "Audio Assets",
-          "Audio to all other modalities",
+          "Listen to provided audio recordings and complete tasks like transcription, summarization, or creating related media outputs.",
           AnnotateModalityEnum.audio,
         ),
         _buildActionCard(
           context,
           theme,
           "Video Assets",
-          "Video to all other modalities",
+          "Review provided videos and follow the instructions to create outputs such as transcripts, summaries, images, or audio narration.",
           AnnotateModalityEnum.video,
         ),
       ],
@@ -254,62 +254,66 @@ class _DashboardScreenState extends State<DashboardScreen> {
     String subtitle,
     AnnotateModalityEnum modality,
   ) {
-    return Material(
-      color: theme.colorScheme.surface,
-      clipBehavior: .antiAlias,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: theme.colorScheme.outlineVariant),
-      ),
-      elevation: 2,
-      shadowColor: theme.colorScheme.shadow.withAlpha(100),
-      child: InkWell(
-        onTap: () {
-          // Only navigate if route exists, for now just print or show snackbar if not implemented in router
-          context.goNamed(
-            AnnotateAssetScreen.routeName,
-            queryParameters: {
-              AnnotateAssetScreen.modalityQueryParam: modality.repr,
-            },
-          );
-        },
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: getModalityColor(modality).withAlpha(25),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  getModalityIcon(modality),
-                  color: getModalityColor(modality),
-                  size: 32,
-                ),
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Material(
+        color: theme.colorScheme.surface,
+        clipBehavior: .antiAlias,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: BorderSide(color: theme.colorScheme.outlineVariant),
+        ),
+        elevation: 2,
+        shadowColor: theme.colorScheme.shadow.withAlpha(100),
+        child: InkWell(
+          onTap: () {
+            // Only navigate if route exists, for now just print or show snackbar if not implemented in router
+            context.goNamed(
+              AnnotateAssetScreen.routeName,
+              queryParameters: {
+                AnnotateAssetScreen.modalityQueryParam: modality.repr,
+              },
+            );
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: getModalityColor(modality).withAlpha(25),
+                    shape: BoxShape.circle,
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    subtitle,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant,
-                    ),
+                  child: Icon(
+                    getModalityIcon(modality),
+                    color: getModalityColor(modality),
+                    size: 32,
                   ),
-                ],
-              ),
-            ],
+                ),
+                const SizedBox(height: 16),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      subtitle,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),

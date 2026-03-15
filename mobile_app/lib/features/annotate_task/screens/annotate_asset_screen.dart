@@ -21,7 +21,7 @@ class AnnotateAssetScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("$modality Assets")),
+      appBar: AppBar(title: Text("$modalityTitle Assets")),
       body: BlocListener<AnnotateTaskBloc, AnnotateTaskState>(
         listenWhen: (previous, current) {
           return current.status.event is CreateAnnotateTaskEvent;
@@ -70,7 +70,11 @@ class AnnotateAssetScreen extends StatelessWidget {
           }
         },
         child: FutureBuilder(
-          future: context.read<AssetRepository>().getRecentAssets(),
+          future: context.read<AssetRepository>().getRecentAssets(
+            modality: AnnotateModalityEnum.values
+                .where((e) => e.repr == modality)
+                .first,
+          ),
           builder: (context, asyncSnapshot) {
             if (asyncSnapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
@@ -80,6 +84,9 @@ class AnnotateAssetScreen extends StatelessWidget {
               return Center(
                 child: Text("Failed to load assets: ${asyncSnapshot.error}"),
               );
+            }
+            if (asyncSnapshot.data!.isEmpty) {
+              return const Center(child: Text("No assets found"));
             }
             return Column(
               crossAxisAlignment: .stretch,
@@ -130,11 +137,14 @@ class AnnotateAssetScreen extends StatelessWidget {
     );
   }
 
-  String get modality {
-    final raw = routerState.uri.queryParameters[modalityQueryParam];
-    if (raw == null) return "Annotate";
+  String? get modality {
+    return routerState.uri.queryParameters[modalityQueryParam];
+  }
+
+  String get modalityTitle {
+    if (modality == null) return "Annotate";
     return AnnotateModalityEnum.values
-        .firstWhere((e) => e.repr == raw)
+        .firstWhere((e) => e.repr == modality)
         .repr
         .toTitleCase(sep: '_');
   }

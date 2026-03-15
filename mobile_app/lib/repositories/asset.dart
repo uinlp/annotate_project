@@ -10,6 +10,9 @@ final class AssetRepository extends BaseRepository {
     int offset = 0,
     AnnotateModalityEnum? modality,
   }) async {
+    debugPrint(
+      "Getting assets with limit: $limit, offset: $offset, modality: $modality",
+    );
     final response = await client.get(
       "assets/",
       queryParameters: {
