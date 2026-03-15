@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:uinlp_annotate_repository/models/annotate_task.dart';
 
 const Color _appPrimary = Color(0xFF3341A4); // deep indigo/purple
 const Color _appSecondary = Color(0xFF00BFA5); // teal accent

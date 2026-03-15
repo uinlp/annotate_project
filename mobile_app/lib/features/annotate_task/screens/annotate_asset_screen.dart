@@ -5,9 +5,10 @@ import 'package:intl/intl.dart';
 import 'package:uinlp_annotate/components/asset_tile.dart';
 import 'package:uinlp_annotate/features/annotate_task/bloc/annotate_task_bloc.dart';
 import 'package:uinlp_annotate/features/annotate_task/screens/annotate_editor_screen.dart';
+import 'package:uinlp_annotate/models/annotate_task.dart';
+import 'package:uinlp_annotate/repositories/base.dart';
 import 'package:uinlp_annotate/utilities/helper.dart';
 import 'package:uinlp_annotate/utilities/status.dart';
-import 'package:uinlp_annotate_repository/uinlp_annotate_repository.dart';
 
 class AnnotateAssetScreen extends StatelessWidget {
   const AnnotateAssetScreen({super.key, required this.routerState});

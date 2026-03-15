@@ -3,9 +3,10 @@ import 'package:amplify_authenticator/amplify_authenticator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:uinlp_annotate/features/annotate_task/bloc/annotate_task_bloc.dart';
+import 'package:uinlp_annotate/repositories/base.dart';
+import 'package:uinlp_annotate/repositories/prod.dart';
 import 'package:uinlp_annotate/utilities/router.dart';
 import 'package:uinlp_annotate/utilities/theme.dart';
-import 'package:uinlp_annotate_repository/uinlp_annotate_repository.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
 
 import 'amplify_outputs.dart';

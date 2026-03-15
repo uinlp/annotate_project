@@ -3,9 +3,9 @@ import 'dart:io';
 import 'package:archive/archive_io.dart';
 import 'package:dio/dio.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:uinlp_annotate_repository/models/annotate_task.dart';
-import 'package:uinlp_annotate_repository/models/user_stats.dart';
-import 'package:uinlp_annotate_repository/repositories/base.dart';
+import 'package:uinlp_annotate/models/annotate_task.dart';
+import 'package:uinlp_annotate/models/user_stats.dart';
+import 'base.dart';
 
 final class UinlpAnnotateRepositoryMock extends UinlpAnnotateRepository {
   final client = Dio(BaseOptions(baseUrl: "http://10.54.227.218:8000/v1/"));

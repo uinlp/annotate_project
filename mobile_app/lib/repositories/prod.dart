@@ -4,9 +4,9 @@ import 'package:archive/archive_io.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:uinlp_annotate_repository/models/annotate_task.dart';
-import 'package:uinlp_annotate_repository/models/user_stats.dart';
-import 'package:uinlp_annotate_repository/repositories/base.dart';
+import '../models/annotate_task.dart';
+import '../models/user_stats.dart';
+import 'base.dart';
 
 final class UinlpAnnotateRepositoryProd extends UinlpAnnotateRepository {
   final String baseUrl;

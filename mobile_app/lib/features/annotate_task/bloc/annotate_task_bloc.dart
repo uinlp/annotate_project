@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:uinlp_annotate/exceptions.dart';
+import 'package:uinlp_annotate/models/annotate_task.dart';
+import 'package:uinlp_annotate/repositories/base.dart';
 import 'package:uinlp_annotate/utilities/status.dart';
-import 'package:uinlp_annotate_repository/models/annotate_task.dart';
-import 'package:uinlp_annotate_repository/exceptions.dart';
-import 'package:uinlp_annotate_repository/repositories/base.dart';
 
 part 'annotate_task_event.dart';
 part 'annotate_task_state.dart';

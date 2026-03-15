@@ -34,14 +34,15 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
-  uinlp_annotate_repository:
-    path: packages/uinlp_annotate_repository
   go_router: ^17.0.1
   flutter_bloc: ^9.1.1
   intl: ^0.20.2
   amplify_auth_cognito: ^2.10.0
   amplify_flutter: ^2.10.0
   amplify_authenticator: ^2.5.1
+  dio: ^5.9.2
+  path_provider: ^2.1.5
+  archive: ^4.0.9
 
 dev_dependencies:
   flutter_test:

@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:uinlp_annotate_repository/repositories/base.dart';
+import '../repositories/base.dart';
 
 enum TaskStatusEnum { todo, inProgress, completed }
 

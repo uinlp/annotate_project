@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:uinlp_annotate/models/annotate_task.dart';
 import 'package:uinlp_annotate/utilities/helper.dart';
-import 'package:uinlp_annotate_repository/models/annotate_task.dart';
 
 class ActivityTile extends StatelessWidget {
   const ActivityTile({

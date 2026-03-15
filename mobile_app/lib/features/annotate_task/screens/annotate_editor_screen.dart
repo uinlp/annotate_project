@@ -6,9 +6,8 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:uinlp_annotate/features/annotate_task/bloc/annotate_task_bloc.dart';
 import 'package:uinlp_annotate/features/main/screens/dashboard_screen.dart';
+import 'package:uinlp_annotate/models/annotate_task.dart';
 import 'package:uinlp_annotate/utilities/helper.dart';
-import 'package:uinlp_annotate_repository/models/annotate_task.dart';
-import 'package:uinlp_annotate_repository/uinlp_annotate_repository.dart';
 
 class AnnotateEditorScreen extends StatefulWidget {
   const AnnotateEditorScreen({super.key, required this.routerState});

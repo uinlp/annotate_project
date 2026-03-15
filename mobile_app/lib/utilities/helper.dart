@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:uinlp_annotate_repository/models/annotate_task.dart';
+import 'package:uinlp_annotate/models/annotate_task.dart';
 
 Color getStatusColor(TaskStatusEnum status) {
   switch (status) {

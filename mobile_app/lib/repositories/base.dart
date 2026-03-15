@@ -3,8 +3,8 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:uinlp_annotate_repository/models/annotate_task.dart';
-import 'package:uinlp_annotate_repository/models/user_stats.dart';
+import '../models/annotate_task.dart';
+import '../models/user_stats.dart';
 
 abstract base class UinlpAnnotateRepository {
   const UinlpAnnotateRepository();

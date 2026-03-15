@@ -9,9 +9,11 @@ import 'package:uinlp_annotate/features/annotate_task/bloc/annotate_task_bloc.da
 import 'package:uinlp_annotate/features/annotate_task/screens/annotate_asset_screen.dart';
 import 'package:uinlp_annotate/features/annotate_task/screens/annotate_editor_screen.dart';
 import 'package:uinlp_annotate/features/annotate_task/screens/recent_tasks_screen.dart';
+import 'package:uinlp_annotate/models/annotate_task.dart';
+import 'package:uinlp_annotate/models/user_stats.dart';
+import 'package:uinlp_annotate/repositories/base.dart';
 import 'package:uinlp_annotate/utilities/helper.dart';
 import 'package:uinlp_annotate/utilities/status.dart';
-import 'package:uinlp_annotate_repository/uinlp_annotate_repository.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -124,7 +126,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             children: [
               TextSpan(text: "Hi, ", style: theme.textTheme.headlineSmall),
               TextSpan(
-                text: asyncSnapshot.data?.userId,
+                text: asyncSnapshot.data?.username.capitalized,
                 style: theme.textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
