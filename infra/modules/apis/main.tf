@@ -101,12 +101,18 @@ resource "aws_iam_role_policy" "role_policy" {
       {
         Action   = "dynamodb:*"
         Effect   = "Allow"
-        Resource = var.datasets_table_arn
+        Resource = [
+          var.datasets_table_arn,
+          "${var.datasets_table_arn}/index/*"
+        ]
       },
       {
         Action   = "dynamodb:*"
         Effect   = "Allow"
-        Resource = var.assets_table_arn
+        Resource = [
+          var.assets_table_arn,
+          "${var.assets_table_arn}/index/*"
+        ]
       },
       {
         Action = "s3:*"
