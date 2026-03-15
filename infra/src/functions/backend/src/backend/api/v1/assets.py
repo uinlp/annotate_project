@@ -10,6 +10,7 @@ from internal.database.models.assets import (
     AssetPublishCreateModel,
     AssetPublishBodyModel,
 )
+from internal.database.models.shared import ModalityTypeEnum
 from internal.repositories.assets import AssetsRepository
 
 
@@ -20,7 +21,7 @@ assets_repository = AssetsRepository()
 
 @router.get("/")
 def list_assets(
-    modality: Annotated[str, Query()] | None = None,
+    modality: Annotated[ModalityTypeEnum, Query()] | None = None,
 ) -> list[AssetModel]:
     return assets_repository.list_assets(modality)
 

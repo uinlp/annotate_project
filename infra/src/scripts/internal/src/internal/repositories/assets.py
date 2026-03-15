@@ -4,6 +4,7 @@ from internal.database.models.assets import (
     AssetPublishModel,
     AssetPublishCreateModel,
 )
+from internal.database.models.shared import ModalityTypeEnum
 from .datasets import DatasetsRepository
 import os
 import boto3
@@ -20,11 +21,11 @@ class AssetsRepository:
         )
         self.assets_table = self.dynamodb.Table(assets_table_name)
 
-    def list_assets(self, modality: str | None = None) -> list[AssetModel]:
+    def list_assets(self, modality: ModalityTypeEnum | None = None) -> list[AssetModel]:
         if modality:
             response = self.assets_table.query(
                 IndexName="modality-index",
-                KeyConditionExpression=Key("modality").eq(modality),
+                KeyConditionExpression=Key("modality").eq(modality.value),
             )
         else:
             response = self.assets_table.scan()
