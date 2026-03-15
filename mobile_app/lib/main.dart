@@ -3,8 +3,9 @@ import 'package:amplify_authenticator/amplify_authenticator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:uinlp_annotate/features/annotate_task/bloc/annotate_task_bloc.dart';
-import 'package:uinlp_annotate/repositories/base.dart';
-import 'package:uinlp_annotate/repositories/prod.dart';
+import 'package:uinlp_annotate/repositories/asset.dart';
+import 'package:uinlp_annotate/repositories/task.dart';
+import 'package:uinlp_annotate/repositories/user.dart';
 import 'package:uinlp_annotate/utilities/router.dart';
 import 'package:uinlp_annotate/utilities/theme.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
@@ -36,20 +37,32 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final userRepo = UserRepository();
+    final taskRepo = TaskRepository();
+    final assetRepo = AssetRepository();
+    Future<String> tokenRetriever() async {
+      final result = await Amplify.Auth.getPlugin(
+        AmplifyAuthCognito.pluginKey,
+      ).fetchAuthSession();
+      return result.userPoolTokensResult.value.idToken.raw;
+    }
+
+    userRepo.init(accessTokenRetriever: tokenRetriever);
+    taskRepo.init(accessTokenRetriever: tokenRetriever);
+    assetRepo.init(accessTokenRetriever: tokenRetriever);
     return MultiRepositoryProvider(
       providers: [
-        RepositoryProvider<UinlpAnnotateRepository>(
-          create: (context) => UinlpAnnotateRepositoryProd(
-            baseUrl: "https://api.uinlp.org.ng/v1/",
-          ),
-          // dispose: (repository) => repository.dispose(),
-        ),
+        RepositoryProvider<UserRepository>(create: (context) => userRepo),
+        RepositoryProvider<TaskRepository>(create: (context) => taskRepo),
+        RepositoryProvider<AssetRepository>(create: (context) => assetRepo),
       ],
       child: MultiBlocProvider(
         providers: [
           BlocProvider(
             create: (context) => AnnotateTaskBloc(
-              repository: context.read<UinlpAnnotateRepository>(),
+              taskRepo: context.read<TaskRepository>(),
+              assetRepo: context.read<AssetRepository>(),
+              userRepo: context.read<UserRepository>(),
             ),
           ),
         ],

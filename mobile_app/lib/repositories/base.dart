@@ -1,56 +1,70 @@
-import 'dart:convert';
+import 'dart:async';
 import 'dart:io';
 
+import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
-import '../models/annotate_task.dart';
-import '../models/user_stats.dart';
 
-abstract base class UinlpAnnotateRepository {
-  const UinlpAnnotateRepository();
+base class BaseRepository {
+  late Dio client;
+  String? accessToken;
+  Future<String> Function()? accessTokenRetriever;
+  final Completer isInitialized = Completer();
 
-  // Future<void> init();
-
-  // Future<void> dispose();
-
-  Future<UserStatsModel> getUserStatsModel();
-  Future<List<AnnotateTaskModel>> getRecentTasks({
-    int limit = 10,
-    int offset = 0,
-    TaskTypeEnum? type,
-  }) async {
-    // return store.selectTasks();
-    print("Getting recent tasks from workspace directory");
-    final workspaceDir = await getWorkspaceDirectory();
-    final tasks = <AnnotateTaskModel>[];
-    debugPrint("Workspace list: ${workspaceDir.listSync().map((e) => e.path)}");
-    for (final file in workspaceDir.listSync()) {
-      if (file is Directory) {
-        final taskFile = File("${file.path}/task.json");
-        if (taskFile.existsSync()) {
-          final taskJson = jsonDecode(taskFile.readAsStringSync());
-          tasks.add(AnnotateTaskModel.fromJson(taskJson));
-        }
-      }
+  void init({Future<String> Function()? accessTokenRetriever}) {
+    debugPrint("Initializing $runtimeType");
+    if (isInitialized.isCompleted) {
+      debugPrint("$runtimeType already initialized");
+      return;
     }
-    return tasks;
+    this.accessTokenRetriever = accessTokenRetriever;
+    final baseUrl = const String.fromEnvironment("API_BASE_URL");
+    print("API_BASE_URL: $baseUrl");
+    client = Dio(
+      BaseOptions(baseUrl: "$baseUrl/v1/", validateStatus: (status) => true),
+    );
+    client.interceptors.add(
+      InterceptorsWrapper(
+        onRequest: (options, handler) async {
+          debugPrint("Request: ${options.method} ${options.path}");
+          if (accessToken != null) {
+            debugPrint("Using access token");
+            options.headers["Authorization"] = "Bearer $accessToken";
+          } else if (accessTokenRetriever != null) {
+            debugPrint("Getting access token");
+            accessToken = await accessTokenRetriever();
+            debugPrint("Got access token");
+            options.headers["Authorization"] = "Bearer $accessToken";
+          } else {
+            debugPrint("No access token");
+          }
+          handler.next(options);
+        },
+        onResponse: (response, handler) async {
+          debugPrint("Response: ${response.statusCode}");
+          if (response.statusCode == 401 &&
+              accessToken != null &&
+              accessTokenRetriever != null) {
+            debugPrint("Refreshing access token");
+            accessToken = await accessTokenRetriever();
+            response.headers.add("Authorization", "Bearer $accessToken");
+            handler.resolve(response);
+          } else {
+            handler.next(response);
+          }
+        },
+      ),
+    );
+    isInitialized.complete();
+    debugPrint("$runtimeType initialized");
   }
 
-  Future<List<AnnotateAssetModel>> getRecentAssets({
-    int limit = 10,
-    int offset = 0,
-  });
-  Future<AnnotateTaskModel> createAnnotateTask({
-    required AnnotateAssetModel asset,
-  });
-  // Future<List<TaskTypeEnum>> getAvailableTaskTypeEnums(); // TaskTypeEnum is an enum, maybe just hardcode or return list of available ones if dynamic.
-}
-
-Future<Directory> getWorkspaceDirectory() async {
-  final appDocDir = await getApplicationDocumentsDirectory();
-  final workspaceDir = Directory("${appDocDir.path}/uinlp_workspace");
-  if (!await workspaceDir.exists()) {
-    await workspaceDir.create(recursive: true);
+  static Future<Directory> getWorkspaceDirectory() async {
+    final appDocDir = await getApplicationDocumentsDirectory();
+    final workspaceDir = Directory("${appDocDir.path}/uinlp_workspace");
+    if (!await workspaceDir.exists()) {
+      await workspaceDir.create(recursive: true);
+    }
+    return workspaceDir;
   }
-  return workspaceDir;
 }

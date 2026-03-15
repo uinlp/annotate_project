@@ -2,20 +2,29 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:uinlp_annotate/exceptions.dart';
 import 'package:uinlp_annotate/models/annotate_task.dart';
+import 'package:uinlp_annotate/repositories/asset.dart';
 import 'package:uinlp_annotate/repositories/base.dart';
+import 'package:uinlp_annotate/repositories/task.dart';
+import 'package:uinlp_annotate/repositories/user.dart';
 import 'package:uinlp_annotate/utilities/status.dart';
 
 part 'annotate_task_event.dart';
 part 'annotate_task_state.dart';
 
 class AnnotateTaskBloc extends Bloc<AnnotateTaskEvent, AnnotateTaskState> {
-  final UinlpAnnotateRepository repository;
-  AnnotateTaskBloc({required this.repository}) : super(AnnotateTaskState()) {
+  final TaskRepository taskRepo;
+  final AssetRepository assetRepo;
+  final UserRepository userRepo;
+  AnnotateTaskBloc({
+    required this.taskRepo,
+    required this.assetRepo,
+    required this.userRepo,
+  }) : super(AnnotateTaskState()) {
     on<LoadAnnotateTaskEvent>((event, emit) async {
       debugPrint("Loading annotate tasks");
       emit(state.copyWith(status: LoadingStatus(event: event)));
       try {
-        final tasks = await repository.getRecentTasks();
+        final tasks = await taskRepo.getRecentTasks();
         debugPrint("Loaded annotate tasks: ${tasks.length}");
         emit(
           state.copyWith(
@@ -45,7 +54,7 @@ class AnnotateTaskBloc extends Bloc<AnnotateTaskEvent, AnnotateTaskState> {
             message: "You have already created an annotate task for this asset",
           );
         }
-        final task = await repository.createAnnotateTask(asset: event.asset);
+        final task = await taskRepo.createAnnotateTask(asset: event.asset);
         debugPrint("Created annotate task: ${task.id}");
         emit(
           state.copyWith(

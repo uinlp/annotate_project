@@ -1,0 +1,30 @@
+{
+	"folders": [
+		{
+			"path": ".github",
+			"name": "GitHub"
+		},
+		{
+			"path": "infra",
+			"name": "Infrastructure"
+		},
+		{
+			"path": "mobile_app",
+			"name": "Mobile App"
+		},
+		{
+			"path": "docs",
+			"name": "Documentation"
+		}
+	],
+	"settings": {
+		"terminal.integrated.cwd": "${workspaceFolder}/infra/environments/prod",
+		"terminal.integrated.env.windows": {
+			"AWS_PROFILE": "vanguard:uinlp",
+			"AWS_REGION": "af-south-1"
+		},
+		"yaml.schemas": {
+			"https://raw.githubusercontent.com/aws/serverless-application-model/main/samtranslator/schema/schema.json": "file:///d%3A/uinlp_project/backend/template.yml"
+		}
+	}
+}

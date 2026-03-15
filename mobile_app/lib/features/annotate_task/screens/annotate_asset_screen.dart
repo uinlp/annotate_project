@@ -6,7 +6,7 @@ import 'package:uinlp_annotate/components/asset_tile.dart';
 import 'package:uinlp_annotate/features/annotate_task/bloc/annotate_task_bloc.dart';
 import 'package:uinlp_annotate/features/annotate_task/screens/annotate_editor_screen.dart';
 import 'package:uinlp_annotate/models/annotate_task.dart';
-import 'package:uinlp_annotate/repositories/base.dart';
+import 'package:uinlp_annotate/repositories/asset.dart';
 import 'package:uinlp_annotate/utilities/helper.dart';
 import 'package:uinlp_annotate/utilities/status.dart';
 
@@ -70,7 +70,7 @@ class AnnotateAssetScreen extends StatelessWidget {
           }
         },
         child: FutureBuilder(
-          future: context.read<UinlpAnnotateRepository>().getRecentAssets(),
+          future: context.read<AssetRepository>().getRecentAssets(),
           builder: (context, asyncSnapshot) {
             if (asyncSnapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());

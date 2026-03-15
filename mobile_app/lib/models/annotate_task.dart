@@ -102,7 +102,7 @@ class AnnotateTaskModel {
       commits.isEmpty ? 0.0 : (commits.length / dataIds.length);
 
   Future<File> loadDataFile(int dataIndex) async {
-    final workingDir = await getWorkspaceDirectory();
+    final workingDir = await BaseRepository.getWorkspaceDirectory();
     print(
       "Working directory: ${workingDir.listSync().map((e) => e.path).toList()}",
     );
@@ -114,7 +114,7 @@ class AnnotateTaskModel {
     int dataIndex,
     AnnotateFieldModel field,
   ) async {
-    final workingDir = await getWorkspaceDirectory();
+    final workingDir = await BaseRepository.getWorkspaceDirectory();
     final file = File(
       "${workingDir.path}/$id/media/${dataIds[dataIndex]}/${field.name}.${field.modality.ext}",
     );
@@ -133,7 +133,7 @@ class AnnotateTaskModel {
   }
 
   Future<void> saveTaskFile() async {
-    final workingDir = await getWorkspaceDirectory();
+    final workingDir = await BaseRepository.getWorkspaceDirectory();
     final taskFile = File("${workingDir.path}/$id/task.json");
     await taskFile.writeAsString(jsonEncode(toJson()));
   }

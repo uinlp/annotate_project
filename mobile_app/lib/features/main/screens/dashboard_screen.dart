@@ -11,7 +11,7 @@ import 'package:uinlp_annotate/features/annotate_task/screens/annotate_editor_sc
 import 'package:uinlp_annotate/features/annotate_task/screens/recent_tasks_screen.dart';
 import 'package:uinlp_annotate/models/annotate_task.dart';
 import 'package:uinlp_annotate/models/user_stats.dart';
-import 'package:uinlp_annotate/repositories/base.dart';
+import 'package:uinlp_annotate/repositories/user.dart';
 import 'package:uinlp_annotate/utilities/helper.dart';
 import 'package:uinlp_annotate/utilities/status.dart';
 
@@ -25,29 +25,15 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
-  // Using the mock repository directly. In a real app, use Provider/GetIt/Bloc.
-  late final UinlpAnnotateRepository _repository;
-
-  late Future<UserStatsModel> _statsFuture;
-
   @override
   void initState() {
     super.initState();
-    _repository = context.read<UinlpAnnotateRepository>();
-    _loadData();
     context.read<AnnotateTaskBloc>().add(LoadAnnotateTaskEvent());
-  }
-
-  void _loadData() {
-    _statsFuture = _repository.getUserStatsModel();
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    // final ittTasks = context.read<ImageToTextBloc>().state.tasks;
-    // List<AnnotateTaskModel> recentTasks = [...ittTasks]
-    //   ..sort((a, b) => b.lastUpdated.compareTo(a.lastUpdated));
 
     return Scaffold(
       body: CustomScrollView(
@@ -146,7 +132,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   Widget _buildStatsSection(ThemeData theme) {
     return FutureBuilder<UserStatsModel>(
-      future: _statsFuture,
+      future: context.read<UserRepository>().getUserStatsModel(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
           return const Center(child: LinearProgressIndicator());
