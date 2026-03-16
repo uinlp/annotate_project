@@ -1,6 +1,8 @@
 #====================================
 # Cognito User Pool
 #====================================
+data "aws_region" "current" {}
+
 resource "aws_cognito_user_pool" "user_pool" {
   name                     = "uinlp-user-pool"
   auto_verified_attributes = ["email"]

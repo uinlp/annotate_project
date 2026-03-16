@@ -16,7 +16,6 @@ provider "docker" {
     address  = data.aws_ecr_authorization_token.token.proxy_endpoint
   }
 }
-data "aws_region" "current" {}
 # ===================================
 # Docker Build: UINLP Backend
 # ===================================
