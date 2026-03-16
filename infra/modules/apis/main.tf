@@ -157,8 +157,8 @@ module "api_gateway" {
       authorizer_type  = "JWT"
       identity_sources = ["$request.header.Authorization"]
       jwt_configuration = {
-        audience = [aws_cognito_user_pool_client.client.id]
-        issuer   = "https://${aws_cognito_user_pool.user_pool.endpoint}"
+        audience = [var.user_pool_client_id]
+        issuer   = "https://${var.user_pool_endpoint}"
       }
     }
   }
