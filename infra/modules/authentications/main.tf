@@ -52,6 +52,6 @@ resource "aws_cognito_managed_login_branding" "client" {
 }
 resource "aws_cognito_user_pool_domain" "user_pool_domain" {
   user_pool_id          = aws_cognito_user_pool.user_pool.id
-  domain                = "uinlp-auth"
+  domain                = "uinlp-auths"
   managed_login_version = 2
 }
