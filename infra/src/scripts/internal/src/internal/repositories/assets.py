@@ -34,7 +34,15 @@ class AssetsRepository:
 
     def get_asset(self, asset_id: str) -> AssetModel:
         response = self.assets_table.get_item(Key={"id": asset_id})
+        if "Item" not in response:
+            raise ValueError(f"Asset with id {asset_id} not found")
         return AssetModel(**response["Item"])
+
+    def update_asset(self, asset: AssetModel) -> None:
+        self.assets_table.put_item(Item=asset.model_dump(mode="json"))
+
+    def delete_asset(self, asset_id: str) -> None:
+        self.assets_table.delete_item(Key={"id": asset_id})
 
     def create_asset(self, asset: AssetCreateModel) -> None:
         dr = DatasetsRepository()

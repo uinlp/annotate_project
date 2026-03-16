@@ -9,6 +9,7 @@ import 'package:uinlp_annotate/features/annotate_task/bloc/annotate_task_bloc.da
 import 'package:uinlp_annotate/features/annotate_task/screens/annotate_asset_screen.dart';
 import 'package:uinlp_annotate/features/annotate_task/screens/annotate_editor_screen.dart';
 import 'package:uinlp_annotate/features/annotate_task/screens/recent_tasks_screen.dart';
+import 'package:uinlp_annotate/features/main/screens/profile_screen.dart';
 import 'package:uinlp_annotate/models/annotate_task.dart';
 import 'package:uinlp_annotate/models/user_stats.dart';
 import 'package:uinlp_annotate/repositories/user.dart';
@@ -47,7 +48,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 icon: const Icon(Icons.notifications_outlined),
               ),
               IconButton(
-                onPressed: () {},
+                onPressed: () {
+                  context.goNamed(ProfileScreen.routeName);
+                },
                 icon: const Icon(Icons.person_outline),
               ),
             ],

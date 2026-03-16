@@ -35,7 +35,15 @@ class DatasetsRepository:
 
     def get_dataset(self, dataset_id: str) -> DatasetModel:
         response = self.datasets_table.get_item(Key={"id": dataset_id})
+        if "Item" not in response:
+            raise ValueError(f"Dataset with id {dataset_id} not found")
         return DatasetModel(**response["Item"])
+
+    def update_dataset(self, dataset: DatasetModel) -> None:
+        self.datasets_table.put_item(Item=dataset.model_dump(mode="json"))
+
+    def delete_dataset(self, dataset_id: str) -> None:
+        self.datasets_table.delete_item(Key={"id": dataset_id})
 
     def create_dataset(self, dataset: DatasetCreateModel) -> DatasetUploadModel:
         self.datasets_table.put_item(

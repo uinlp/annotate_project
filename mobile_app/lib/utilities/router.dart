@@ -3,6 +3,7 @@ import 'package:uinlp_annotate/features/annotate_task/screens/annotate_asset_scr
 import 'package:uinlp_annotate/features/annotate_task/screens/annotate_editor_screen.dart';
 import 'package:uinlp_annotate/features/annotate_task/screens/recent_tasks_screen.dart';
 import 'package:uinlp_annotate/features/main/screens/dashboard_screen.dart';
+import 'package:uinlp_annotate/features/main/screens/profile_screen.dart';
 
 final GoRouter appRouter = GoRouter(
   initialLocation: "/",
@@ -26,6 +27,11 @@ final GoRouter appRouter = GoRouter(
           path: "editor",
           name: AnnotateEditorScreen.routeName,
           builder: (context, state) => AnnotateEditorScreen(routerState: state),
+        ),
+        GoRoute(
+          path: "profile",
+          name: ProfileScreen.routeName,
+          builder: (context, state) => const ProfileScreen(),
         ),
       ],
     ),

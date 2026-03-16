@@ -31,6 +31,23 @@ def create_asset(asset: AssetCreateModel) -> None:
     assets_repository.create_asset(asset)
 
 
+@router.put("/{asset_id}")
+def update_asset(asset_id: Annotated[str, Path()], asset: AssetModel) -> None:
+    if asset_id != asset.id:
+        raise ValueError("Asset id does not match")
+    assets_repository.update_asset(asset)
+
+
+@router.delete("/{asset_id}")
+def delete_asset(asset_id: Annotated[str, Path()]) -> None:
+    assets_repository.delete_asset(asset_id)
+
+
+@router.get("/{asset_id}")
+def get_asset(asset_id: Annotated[str, Path()]) -> AssetModel:
+    return assets_repository.get_asset(asset_id)
+
+
 @router.post("/publish-url")
 def create_publish_url(body: AssetPublishBodyModel) -> AssetPublishModel:
     model = AssetPublishCreateModel(
@@ -47,8 +64,3 @@ def publish_asset(body: AssetPublishBodyModel) -> None:
         publisher_id="",  # Will be replaced with the publisher id from the token
     )
     return assets_repository.published(model)
-
-
-@router.get("/{asset_id}")
-def get_asset(asset_id: Annotated[str, Path()]) -> AssetModel:
-    return assets_repository.get_asset(asset_id)

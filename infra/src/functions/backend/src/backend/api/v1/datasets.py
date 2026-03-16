@@ -27,6 +27,18 @@ def create_dataset(dataset: DatasetCreateModel) -> DatasetUploadModel:
     return datasets_repository.create_dataset(dataset)
 
 
+@router.put("/{dataset_id}")
+def update_dataset(dataset_id: Annotated[str, Path()], dataset: DatasetModel) -> None:
+    if dataset_id != dataset.id:
+        raise ValueError("Dataset id does not match")
+    datasets_repository.update_dataset(dataset)
+
+
+@router.delete("/{dataset_id}")
+def delete_dataset(dataset_id: Annotated[str, Path()]) -> None:
+    datasets_repository.delete_dataset(dataset_id)
+
+
 @router.get("/{dataset_id}")
 def get_dataset(dataset_id: Annotated[str, Path()]) -> DatasetModel:
     return datasets_repository.get_dataset(dataset_id)
