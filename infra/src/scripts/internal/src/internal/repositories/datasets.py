@@ -1,11 +1,10 @@
 from internal.database.models.datasets import (
     DatasetModel,
     DatasetCreateModel,
-    DatasetUploadModel,
     ModalityTypeEnum,
-    DatasetBatchDownloadModel,
     DatasetBatchDownloadCreateModel,
 )
+from internal.database.models.shared import S3UrlModel
 import os
 import boto3
 import io
@@ -45,7 +44,7 @@ class DatasetsRepository:
     def delete_dataset(self, dataset_id: str) -> None:
         self.datasets_table.delete_item(Key={"id": dataset_id})
 
-    def create_dataset(self, dataset: DatasetCreateModel) -> DatasetUploadModel:
+    def create_dataset(self, dataset: DatasetCreateModel) -> S3UrlModel:
         self.datasets_table.put_item(
             Item=DatasetModel(**dataset.model_dump(mode="json")).model_dump(mode="json")
         )
@@ -57,7 +56,7 @@ class DatasetsRepository:
             },
             ExpiresIn=3600,
         )
-        return DatasetUploadModel(url=upload_url)
+        return S3UrlModel(url=upload_url, expires_in=3600)
 
     def make_batches(self, bucket_name, object_key):
         logger.info(f"Making batches for {bucket_name} {object_key}")
@@ -144,4 +143,4 @@ class DatasetsRepository:
             },
             ExpiresIn=3600,
         )
-        return DatasetBatchDownloadModel(url=url)
+        return S3UrlModel(url=url, expires_in=3600)

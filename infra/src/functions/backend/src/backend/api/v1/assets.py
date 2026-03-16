@@ -6,11 +6,11 @@ from typing import Annotated
 from internal.database.models.assets import (
     AssetModel,
     AssetCreateModel,
-    AssetPublishModel,
     AssetPublishCreateModel,
     AssetPublishBodyModel,
+    AssetPublishModel,
 )
-from internal.database.models.shared import ModalityTypeEnum
+from internal.database.models.shared import ModalityTypeEnum, S3UrlModel
 from internal.repositories.assets import AssetsRepository
 
 
@@ -49,7 +49,7 @@ def get_asset(asset_id: Annotated[str, Path()]) -> AssetModel:
 
 
 @router.post("/publish-url")
-def create_publish_url(body: AssetPublishBodyModel) -> AssetPublishModel:
+def create_publish_url(body: AssetPublishBodyModel) -> S3UrlModel:
     model = AssetPublishCreateModel(
         asset_id=body.asset_id,
         publisher_id="",  # Will be replaced with the publisher id from the token
@@ -63,4 +63,17 @@ def publish_asset(body: AssetPublishBodyModel) -> None:
         asset_id=body.asset_id,
         publisher_id="",  # Will be replaced with the publisher id from the token
     )
-    return assets_repository.published(model)
+    return assets_repository.publish_asset(model)
+
+
+@router.post("/verify")
+def verify_publish(create_model: AssetPublishCreateModel) -> None:
+    return assets_repository.verify_publish(create_model)
+
+
+@router.get("/publishes")
+def list_publishes(
+    asset_id: Annotated[str, Query()] | None = None,
+    publisher_id: Annotated[str, Query()] | None = None,
+) -> list[AssetPublishModel]:
+    return assets_repository.list_publishes(asset_id, publisher_id)

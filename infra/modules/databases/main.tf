@@ -71,6 +71,39 @@ module "uinlp_assets" {
   }
 }
 
+module "uinlp_publishes" {
+  source = "terraform-aws-modules/dynamodb-table/aws"
+
+  name      = "uinlp-publishes"
+  hash_key  = "asset_id"
+  range_key = "publisher_id"
+
+  attributes = [
+    {
+      name = "asset_id"
+      type = "S"
+    },
+    {
+      name = "publisher_id"
+      type = "S"
+    }
+  ]
+
+  global_secondary_indexes = [
+    {
+      name            = "publisher-index"
+      hash_key        = "publisher_id"
+      range_key       = "asset_id"
+      projection_type = "ALL"
+    }
+  ]
+
+  tags = {
+    Terraform   = "true"
+    Environment = "prod"
+  }
+}
+
 # ===================================
 # S3 Buckets
 # ===================================
@@ -158,8 +191,16 @@ module "datasets_objects_maker" {
   environment_variables = {
     DATASETS_TABLE_NAME          = module.uinlp_datasets.dynamodb_table_id
     ASSETS_TABLE_NAME            = module.uinlp_assets.dynamodb_table_id
+    PUBLISHES_TABLE_NAME         = module.uinlp_publishes.dynamodb_table_id
     DATASETS_OBJECTS_BUCKET_NAME = module.datasets_objects_bucket.s3_bucket_id
     DATASETS_TEMP_BUCKET_NAME    = module.datasets_temp_bucket.s3_bucket_id
+    COGNITO_DOMAIN               = var.user_pool_domain
+    COGNITO_CLIENT_ID            = var.user_pool_client_id
+    COGNITO_USER_POOL_ID         = var.user_pool_id
+    SECRET_KEY                   = "secret-key-1234567890"
+    COGNITO_AUTHORITY            = var.user_pool_authority
+    COGNITO_REDIRECT_URI         = "/oauth2/callback"
+    COGNITO_LOGOUT_URI           = "/oauth2/logout"
   }
 
   # Standard Lambda configurations
@@ -177,19 +218,15 @@ resource "aws_iam_role_policy" "role_policy" {
     Version = "2012-10-17"
     Statement = [
       {
-        Action   = "dynamodb:*"
-        Effect   = "Allow"
+        Action = "dynamodb:*"
+        Effect = "Allow"
         Resource = [
           module.uinlp_datasets.dynamodb_table_arn,
-          "${module.uinlp_datasets.dynamodb_table_arn}/index/*"
-        ]
-      },
-      {
-        Action   = "dynamodb:*"
-        Effect   = "Allow"
-        Resource = [
+          "${module.uinlp_datasets.dynamodb_table_arn}/index/*",
           module.uinlp_assets.dynamodb_table_arn,
-          "${module.uinlp_assets.dynamodb_table_arn}/index/*"
+          "${module.uinlp_assets.dynamodb_table_arn}/index/*",
+          module.uinlp_publishes.dynamodb_table_arn,
+          "${module.uinlp_publishes.dynamodb_table_arn}/index/*"
         ]
       },
       {
@@ -197,17 +234,11 @@ resource "aws_iam_role_policy" "role_policy" {
         Effect = "Allow"
         Resource = [
           module.datasets_objects_bucket.s3_bucket_arn,
-          "${module.datasets_objects_bucket.s3_bucket_arn}/*"
-        ]
-      },
-      {
-        Action = "s3:*"
-        Effect = "Allow"
-        Resource = [
+          "${module.datasets_objects_bucket.s3_bucket_arn}/*",
           module.datasets_temp_bucket.s3_bucket_arn,
           "${module.datasets_temp_bucket.s3_bucket_arn}/*"
         ]
-      },
+      }
     ]
   })
 }

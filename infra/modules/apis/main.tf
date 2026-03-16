@@ -72,13 +72,15 @@ module "lambda_function" {
   environment_variables = {
     DATASETS_TABLE_NAME          = var.datasets_table_name
     ASSETS_TABLE_NAME            = var.assets_table_name
+    PUBLISHES_TABLE_NAME         = var.publishes_table_name
     DATASETS_OBJECTS_BUCKET_NAME = var.datasets_objects_bucket_name
     DATASETS_TEMP_BUCKET_NAME    = var.datasets_temp_bucket_name
-    ASSETS_PUBLISHES_BUCKET_NAME = var.assets_publishes_bucket_name
-    COGNITO_DOMAIN               = "https://${aws_cognito_user_pool_domain.user_pool_domain.domain}.auth.${data.aws_region.current.name}.amazoncognito.com"
-    COGNITO_CLIENT_ID            = aws_cognito_user_pool_client.client.id
+    PUBLISHES_BUCKET_NAME        = var.assets_publishes_bucket_name
+    COGNITO_DOMAIN               = var.user_pool_domain
+    COGNITO_CLIENT_ID            = var.user_pool_client_id
+    COGNITO_USER_POOL_ID         = var.user_pool_id
     SECRET_KEY                   = "secret-key-1234567890"
-    COGNITO_AUTHORITY            = "https://${aws_cognito_user_pool.user_pool.endpoint}"
+    COGNITO_AUTHORITY            = var.user_pool_authority
     COGNITO_REDIRECT_URI         = "/oauth2/callback"
     COGNITO_LOGOUT_URI           = "/oauth2/logout"
   }
@@ -99,19 +101,15 @@ resource "aws_iam_role_policy" "role_policy" {
     Version = "2012-10-17"
     Statement = [
       {
-        Action   = "dynamodb:*"
-        Effect   = "Allow"
+        Action = "dynamodb:*"
+        Effect = "Allow"
         Resource = [
           var.datasets_table_arn,
-          "${var.datasets_table_arn}/index/*"
-        ]
-      },
-      {
-        Action   = "dynamodb:*"
-        Effect   = "Allow"
-        Resource = [
+          "${var.datasets_table_arn}/index/*",
           var.assets_table_arn,
-          "${var.assets_table_arn}/index/*"
+          "${var.assets_table_arn}/index/*",
+          var.publishes_table_arn,
+          "${var.publishes_table_arn}/index/*"
         ]
       },
       {
@@ -119,83 +117,15 @@ resource "aws_iam_role_policy" "role_policy" {
         Effect = "Allow"
         Resource = [
           var.datasets_objects_bucket_arn,
-          "${var.datasets_objects_bucket_arn}/*"
-        ]
-      },
-      {
-        Action = "s3:*"
-        Effect = "Allow"
-        Resource = [
+          "${var.datasets_objects_bucket_arn}/*",
           var.datasets_temp_bucket_arn,
-          "${var.datasets_temp_bucket_arn}/*"
-        ]
-      },
-      {
-        Action = "s3:*"
-        Effect = "Allow"
-        Resource = [
+          "${var.datasets_temp_bucket_arn}/*",
           var.assets_publishes_bucket_arn,
           "${var.assets_publishes_bucket_arn}/*"
         ]
       }
     ]
   })
-}
-
-#====================================
-# Cognito User Pool
-#====================================
-resource "aws_cognito_user_pool" "user_pool" {
-  name                     = "uinlp-user-pool"
-  auto_verified_attributes = ["email"]
-  alias_attributes         = ["email", "preferred_username"]
-
-  username_configuration {
-    case_sensitive = false
-  }
-  email_configuration {
-    email_sending_account = "COGNITO_DEFAULT"
-  }
-  password_policy {
-    minimum_length    = 8
-    require_lowercase = true
-    require_uppercase = true
-    require_numbers   = true
-    require_symbols   = true
-  }
-  schema {
-    name                = "email"
-    required            = true
-    attribute_data_type = "String"
-    string_attribute_constraints {
-      min_length = 0
-      max_length = 256
-    }
-  }
-}
-
-resource "aws_cognito_user_pool_client" "client" {
-  name                                 = "uinlp-user-pool-client"
-  user_pool_id                         = aws_cognito_user_pool.user_pool.id
-  allowed_oauth_flows_user_pool_client = true
-  callback_urls                        = ["https://api.uinlp.org.ng/oauth2/callback", "http://localhost:3000/oauth2/callback"]
-  logout_urls                          = ["https://api.uinlp.org.ng/oauth2/logout", "http://localhost:3000/oauth2/logout"]
-  default_redirect_uri                 = "https://api.uinlp.org.ng/oauth2/callback"
-  allowed_oauth_flows                  = ["code", "implicit"]
-  allowed_oauth_scopes                 = ["email", "openid", "profile"]
-  supported_identity_providers         = ["COGNITO"]
-}
-
-resource "aws_cognito_managed_login_branding" "client" {
-  client_id    = aws_cognito_user_pool_client.client.id
-  user_pool_id = aws_cognito_user_pool.user_pool.id
-
-  use_cognito_provided_values = true
-}
-resource "aws_cognito_user_pool_domain" "user_pool_domain" {
-  user_pool_id          = aws_cognito_user_pool.user_pool.id
-  domain                = "uinlp-auth"
-  managed_login_version = 2
 }
 # ===================================
 # API Gateway: UINLP REST API

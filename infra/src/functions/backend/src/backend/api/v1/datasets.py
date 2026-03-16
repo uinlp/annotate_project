@@ -5,10 +5,9 @@ from typing import Annotated
 from internal.database.models.datasets import (
     DatasetModel,
     DatasetCreateModel,
-    DatasetUploadModel,
-    DatasetBatchDownloadModel,
     DatasetBatchDownloadCreateModel,
 )
+from internal.database.models.shared import S3UrlModel
 from internal.repositories.datasets import DatasetsRepository
 
 
@@ -23,7 +22,7 @@ def list_datasets() -> list[DatasetModel]:
 
 
 @router.post("/")
-def create_dataset(dataset: DatasetCreateModel) -> DatasetUploadModel:
+def create_dataset(dataset: DatasetCreateModel) -> S3UrlModel:
     return datasets_repository.create_dataset(dataset)
 
 
@@ -47,5 +46,5 @@ def get_dataset(dataset_id: Annotated[str, Path()]) -> DatasetModel:
 @router.post("/batch-download-url")
 def create_batch_download_url(
     body: DatasetBatchDownloadCreateModel,
-) -> DatasetBatchDownloadModel:
+) -> S3UrlModel:
     return datasets_repository.create_batch_download_url(body)

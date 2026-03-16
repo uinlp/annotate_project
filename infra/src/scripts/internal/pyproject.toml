@@ -1,64 +1,25 @@
 [build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
 
 [project]
 name = "internal"
-dynamic = ["version"]
+version = "0.0.1"
 description = ''
 readme = "README.md"
 requires-python = ">=3.10"
 license = "MIT"
-keywords = []
 authors = [
   { name = "Ahmad Khidir", email = "khidirahmad05@gmail.com" },
 ]
-classifiers = [
-  "Development Status :: 4 - Beta",
-  "Programming Language :: Python",
-  "Programming Language :: Python :: 3.10",
-  "Programming Language :: Python :: 3.11",
-  "Programming Language :: Python :: 3.12",
-  "Programming Language :: Python :: Implementation :: CPython",
-  "Programming Language :: Python :: Implementation :: PyPy",
-]
+
 dependencies = [
   "aws-lambda-powertools",
   "pydantic",
   "boto3",
+  "python-jose[cryptography]",
+  "requests",
 ]
 
-[project.urls]
-Documentation = "https://github.com/Ahmad Khidir/internal#readme"
-Issues = "https://github.com/Ahmad Khidir/internal/issues"
-Source = "https://github.com/Ahmad Khidir/internal"
-
-[tool.hatch.version]
-path = "src/internal/__about__.py"
-
-[tool.hatch.envs.types]
-extra-dependencies = [
-  "mypy>=1.0.0",
-  "types-boto3",
-]
-[tool.hatch.envs.types.scripts]
-check = "mypy --install-types --non-interactive {args:src/internal tests}"
-
-[tool.coverage.run]
-source_pkgs = ["internal", "tests"]
-branch = true
-parallel = true
-omit = [
-  "src/internal/__about__.py",
-]
-
-[tool.coverage.paths]
-internal = ["src/internal", "*/internal/src/internal"]
-tests = ["tests", "*/internal/tests"]
-
-[tool.coverage.report]
-exclude_lines = [
-  "no cov",
-  "if __name__ == .__main__.:",
-  "if TYPE_CHECKING:",
-]
+[tool.setuptools]
+package-dir = {"" = "src"}

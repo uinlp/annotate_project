@@ -41,13 +41,5 @@ class DatasetCreateModel(BaseModel):
         return datetime.now()
 
 
-class DatasetUploadModel(BaseModel):
-    url: str
-
-
-class DatasetBatchDownloadModel(BaseModel):
-    url: str
-
-
 class DatasetBatchDownloadCreateModel(BaseModel):
     batch_key: str

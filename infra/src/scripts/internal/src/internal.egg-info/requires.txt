@@ -1,0 +1,5 @@
+aws-lambda-powertools
+pydantic
+boto3
+python-jose[cryptography]
+requests

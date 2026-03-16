@@ -14,6 +14,14 @@ output "uinlp_assets_table_arn" {
   value = module.uinlp_assets.dynamodb_table_arn
 }
 
+output "uinlp_publishes_table_name" {
+  value = module.uinlp_publishes.dynamodb_table_id
+}
+
+output "uinlp_publishes_table_arn" {
+  value = module.uinlp_publishes.dynamodb_table_arn
+}
+
 output "datasets_objects_bucket_name" {
   value = module.datasets_objects_bucket.s3_bucket_id
 }

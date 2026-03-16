@@ -21,7 +21,8 @@ class AssetModel(BaseModel):
     updated_at: datetime
     annotate_fields: list[AnnotateFieldModel]
     tags: list[str] = []
-    publishers: list[str] = []
+    total_publishes: int = 0
+    # total_downloads: int = 0
 
 
 class AssetCreateModel(BaseModel):
@@ -47,13 +48,29 @@ class AssetCreateModel(BaseModel):
         return datetime.now()
 
 
-class AssetPublishModel(BaseModel):
-    url: str
-
-
 class AssetPublishCreateModel(BaseModel):
     asset_id: str
     publisher_id: str
+
+    @computed_field
+    @property
+    def created_at(self) -> datetime:
+        return datetime.now()
+
+    @computed_field
+    @property
+    def updated_at(self) -> datetime:
+        return datetime.now()
+
+
+class AssetPublishModel(BaseModel):
+    asset_id: str
+    publisher_id: str
+    is_verified: bool = False
+    is_published: bool = False
+    publish_key: str
+    created_at: datetime
+    updated_at: datetime
 
 
 class AssetPublishBodyModel(BaseModel):

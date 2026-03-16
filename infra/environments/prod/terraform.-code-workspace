@@ -1,0 +1,17 @@
+{
+	"folders": [
+		{
+			"path": "../../../"
+		}
+	],
+	"settings": {
+		"terminal.integrated.cwd": "D:/uinlp_project/infra/environments/prod",
+		"terminal.integrated.env.windows": {
+			"AWS_PROFILE": "vanguard:uinlp",
+			"AWS_REGION": "af-south-1"
+		},
+		"yaml.schemas": {
+			"https://raw.githubusercontent.com/aws/serverless-application-model/main/samtranslator/schema/schema.json": "file:///d%3A/uinlp_project/backend/template.yml"
+		}
+	}
+}
