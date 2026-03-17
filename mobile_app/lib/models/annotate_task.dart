@@ -98,15 +98,20 @@ class AnnotateTaskModel {
     this.tags = const [],
   }) : commits = commits ?? {};
 
+  Future<Directory> get taskPath async {
+    final workingDir = await BaseRepository.getWorkspaceDirectory();
+    return Directory("${workingDir.path}/$id");
+  }
+
   double get progress =>
       commits.isEmpty ? 0.0 : (commits.length / dataIds.length);
 
   Future<File> loadDataFile(int dataIndex) async {
-    final workingDir = await BaseRepository.getWorkspaceDirectory();
+    final workingDir = await taskPath;
     print(
       "Working directory: ${workingDir.listSync().map((e) => e.path).toList()}",
     );
-    final file = File("${workingDir.path}/$id/data/${dataIds[dataIndex]}");
+    final file = File("${workingDir.path}/data/${dataIds[dataIndex]}");
     return file;
   }
 
@@ -114,9 +119,9 @@ class AnnotateTaskModel {
     int dataIndex,
     AnnotateFieldModel field,
   ) async {
-    final workingDir = await BaseRepository.getWorkspaceDirectory();
+    final workingDir = await taskPath;
     final file = File(
-      "${workingDir.path}/$id/media/${dataIds[dataIndex]}/${field.name}.${field.modality.ext}",
+      "${workingDir.path}/outputs/${dataIds[dataIndex]}/${field.name}.${field.modality.ext}",
     );
     return file;
   }
@@ -133,8 +138,8 @@ class AnnotateTaskModel {
   }
 
   Future<void> saveTaskFile() async {
-    final workingDir = await BaseRepository.getWorkspaceDirectory();
-    final taskFile = File("${workingDir.path}/$id/task.json");
+    final workingDir = await taskPath;
+    final taskFile = File("${workingDir.path}/task.json");
     await taskFile.writeAsString(jsonEncode(toJson()));
   }
 
@@ -256,12 +261,13 @@ AnnotateModalityEnum modalityFromString(String str) {
   );
 }
 
-class DatasetBatchDownloadModel {
+class S3UrlModel {
   final String url;
+  final int? expiresIn;
 
-  const DatasetBatchDownloadModel({required this.url});
+  const S3UrlModel({required this.url, this.expiresIn});
 
-  factory DatasetBatchDownloadModel.fromJson(Map<String, dynamic> json) {
-    return DatasetBatchDownloadModel(url: json['url']);
+  factory S3UrlModel.fromJson(Map<String, dynamic> json) {
+    return S3UrlModel(url: json['url'], expiresIn: json['expires_in']);
   }
 }

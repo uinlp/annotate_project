@@ -54,6 +54,10 @@ module "uinlp_assets" {
     {
       name = "modality"
       type = "S"
+    },
+    {
+      name = "total_publishes"
+      type = "N"
     }
   ]
 
@@ -86,6 +90,14 @@ module "uinlp_publishes" {
     {
       name = "publisher_id"
       type = "S"
+    },
+    {
+      name = "is_published"
+      type = "BOOL"
+    },
+    {
+      name = "is_verified"
+      type = "BOOL"
     }
   ]
 

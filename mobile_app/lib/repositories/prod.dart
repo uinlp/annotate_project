@@ -51,7 +51,7 @@
 //       throw Exception("Failed to get dataset batch url");
 //     }
 //     debugPrint("Data: ${res.data}");
-//     final datasetBatchDownloadModel = DatasetBatchDownloadModel.fromJson(
+//     final S3UrlModel = S3UrlModel.fromJson(
 //       res.data,
 //     );
 //     // Download zip asset's dataset batch
@@ -59,20 +59,20 @@
 //     final savedPath = "${tempDir.path}/${asset.datasetId}.zip";
 //     try {
 //       await Dio().download(
-//         datasetBatchDownloadModel.url,
+//         S3UrlModel.url,
 //         savedPath,
 //         onReceiveProgress: (count, total) {
 //           debugPrint("$total/$count");
 //         },
 //       );
-//       // final res = await Dio().get(datasetBatchDownloadModel.url);
+//       // final res = await Dio().get(S3UrlModel.url);
 //       // if (res.statusCode != 200) {
 //       //   throw Exception("Failed to download dataset batch - 1");
 //       // }
 //       // final file = File(savedPath);
 //       // await file.writeAsBytes(res.data);
 //     } catch (e) {
-//       debugPrint(datasetBatchDownloadModel.url);
+//       debugPrint(S3UrlModel.url);
 //       debugPrint(
 //         "Failed to download dataset batch: datasets/batch-download-url/${asset.datasetBatchKey} \n $e",
 //       );

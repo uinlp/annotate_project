@@ -74,5 +74,28 @@ class AnnotateTaskBloc extends Bloc<AnnotateTaskEvent, AnnotateTaskState> {
       }
       emit(state.copyWith(status: const IdleStatus()));
     });
+    on<PublishAnnotateTaskEvent>((event, emit) async {
+      debugPrint("Publishing annotate task");
+      emit(state.copyWith(status: LoadingStatus(event: event)));
+      try {
+        await taskRepo.publishTask(task: event.task);
+        debugPrint("Published annotate task: ${event.task.id}");
+        emit(
+          state.copyWith(
+            status: SuccessStatus(data: event.task.id, event: event),
+          ),
+        );
+      } catch (e) {
+        emit(
+          state.copyWith(
+            status: ErrorStatus(
+              event: event,
+              data: RepositoryException.fromCatch(e),
+            ),
+          ),
+        );
+      }
+      emit(state.copyWith(status: const IdleStatus()));
+    });
   }
 }

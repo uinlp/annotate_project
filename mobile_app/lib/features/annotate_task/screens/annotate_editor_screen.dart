@@ -136,7 +136,11 @@ class _AnnotateEditorScreenState extends State<AnnotateEditorScreen> {
       } else {
         field.file.value.writeAsBytesSync(field.value.value ?? []);
       }
-      commitData[field.name] = field.file.value.path;
+      // Save relative path
+      commitData[field.name] = field.file.value.path.replaceFirst(
+        (await task.taskPath).path,
+        "",
+      );
     }
     await task.updateCommit(task.dataIds[currentDataIndex.value], commitData);
     return true;
@@ -152,6 +156,17 @@ class _AnnotateEditorScreenState extends State<AnnotateEditorScreen> {
         .firstOrNull;
     if (task == null) return false;
     return task.progress >= 1.0;
+  }
+
+  void publishTask() {
+    final task = context
+        .read<AnnotateTaskBloc>()
+        .state
+        .tasks
+        .where((e) => e.id == taskId)
+        .firstOrNull;
+    if (task == null) return;
+    context.read<AnnotateTaskBloc>().add(PublishAnnotateTaskEvent(task: task));
   }
 
   @override
@@ -342,9 +357,10 @@ class _AnnotateEditorScreenState extends State<AnnotateEditorScreen> {
                     leading: const Icon(Icons.publish),
                     title: const Text("Publish"),
                     onTap: () {
+                      publishTask();
                       context.pop();
                     },
-                    enabled: enablePublish,
+                    // enabled: enablePublish,
                   ),
                 ],
               );

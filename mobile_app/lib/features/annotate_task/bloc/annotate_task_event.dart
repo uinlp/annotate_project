@@ -8,3 +8,8 @@ class CreateAnnotateTaskEvent extends AnnotateTaskEvent {
   final AnnotateAssetModel asset;
   CreateAnnotateTaskEvent({required this.asset});
 }
+
+class PublishAnnotateTaskEvent extends AnnotateTaskEvent {
+  final AnnotateTaskModel task;
+  PublishAnnotateTaskEvent({required this.task});
+}
