@@ -3,7 +3,7 @@ import 'package:uinlp_annotate/models/annotate_task.dart';
 
 Color getStatusColor(TaskStatusEnum status) {
   switch (status) {
-    case TaskStatusEnum.completed:
+    case TaskStatusEnum.published:
       return Colors.green;
     case TaskStatusEnum.inProgress:
       return Colors.blue;

@@ -5,6 +5,7 @@ import 'package:record/record.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:uinlp_annotate/components/status_card.dart';
 import 'package:video_player/video_player.dart';
 import 'package:uinlp_annotate/features/annotate_task/screens/annotate_editor_screen.dart';
 import 'package:uinlp_annotate/models/annotate_task.dart';
@@ -97,7 +98,7 @@ class _AnnotateAudioFieldState extends State<AnnotateAudioField> {
     super.initState();
     _audioRecorder = AudioRecorder();
     _audioPlayer = AudioPlayer();
-    
+
     _audioPlayer.onPlayerStateChanged.listen((state) {
       if (mounted) {
         setState(() {
@@ -127,11 +128,12 @@ class _AnnotateAudioFieldState extends State<AnnotateAudioField> {
     try {
       if (await _audioRecorder.hasPermission()) {
         final directory = await getTemporaryDirectory();
-        _recordingPath = '${directory.path}/recording_${DateTime.now().millisecondsSinceEpoch}.m4a';
-        
+        _recordingPath =
+            '${directory.path}/recording_${DateTime.now().millisecondsSinceEpoch}.m4a';
+
         const config = RecordConfig();
         await _audioRecorder.start(config, path: _recordingPath!);
-        
+
         setState(() {
           _isRecording = true;
           _isPaused = false;
@@ -179,13 +181,15 @@ class _AnnotateAudioFieldState extends State<AnnotateAudioField> {
         if (_isPlaying) {
           await _audioPlayer.pause();
         } else {
-          // If we have bytes, we might need to save to a temp file to play with audioplayers 
+          // If we have bytes, we might need to save to a temp file to play with audioplayers
           // or use Source.fromBytes if supported (older versions might not have it or it might be buggy)
           // audioplayers 6.1.0 ByteSource
-          await _audioPlayer.play(BytesSource(widget.field.value.value as Uint8List));
+          await _audioPlayer.play(
+            BytesSource(widget.field.value.value as Uint8List),
+          );
         }
       } else if (_recordingPath != null) {
-         await _audioPlayer.play(DeviceFileSource(_recordingPath!));
+        await _audioPlayer.play(DeviceFileSource(_recordingPath!));
       }
     } catch (e) {
       debugPrint('Error playing recording: $e');
@@ -201,8 +205,8 @@ class _AnnotateAudioFieldState extends State<AnnotateAudioField> {
         color: theme.colorScheme.surfaceContainerLow,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: widget.field.value.value != null 
-              ? theme.colorScheme.primary 
+          color: widget.field.value.value != null
+              ? theme.colorScheme.primary
               : theme.colorScheme.outlineVariant,
         ),
       ),
@@ -215,7 +219,9 @@ class _AnnotateAudioFieldState extends State<AnnotateAudioField> {
               const SizedBox(width: 8),
               Text(
                 widget.field.name.toTitleCase(),
-                style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const Spacer(),
               if (widget.field.value.value != null)
@@ -250,22 +256,27 @@ class _AnnotateAudioFieldState extends State<AnnotateAudioField> {
               ],
               const SizedBox(width: 16),
               IconButton.outlined(
-                onPressed: (widget.field.value.value != null || _recordingPath != null) ? _playRecording : null,
+                onPressed:
+                    (widget.field.value.value != null || _recordingPath != null)
+                    ? _playRecording
+                    : null,
                 icon: Icon(_isPlaying ? Icons.pause : Icons.play_arrow),
                 tooltip: _isPlaying ? 'Pause Playback' : 'Play',
               ),
             ],
           ),
           if (_isRecording)
-             Padding(
-               padding: const EdgeInsets.only(top: 8.0),
-               child: Center(
-                 child: Text(
-                   _isPaused ? 'Recording Paused' : 'Recording...',
-                   style: theme.textTheme.labelSmall?.copyWith(color: Colors.red),
-                 ),
-               ),
-             ),
+            Padding(
+              padding: const EdgeInsets.only(top: 8.0),
+              child: Center(
+                child: Text(
+                  _isPaused ? 'Recording Paused' : 'Recording...',
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: Colors.red,
+                  ),
+                ),
+              ),
+            ),
         ],
       ),
     );
@@ -322,7 +333,9 @@ class _AnnotateImageFieldState extends State<AnnotateImageField> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final hasValue = widget.field.value.value != null && widget.field.value.value is Uint8List;
+    final hasValue =
+        widget.field.value.value != null &&
+        widget.field.value.value is Uint8List;
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -330,7 +343,9 @@ class _AnnotateImageFieldState extends State<AnnotateImageField> {
         color: theme.colorScheme.surfaceContainerLow,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: hasValue ? theme.colorScheme.primary : theme.colorScheme.outlineVariant,
+          color: hasValue
+              ? theme.colorScheme.primary
+              : theme.colorScheme.outlineVariant,
         ),
       ),
       child: Column(
@@ -342,7 +357,9 @@ class _AnnotateImageFieldState extends State<AnnotateImageField> {
               const SizedBox(width: 8),
               Text(
                 widget.field.name.toTitleCase(),
-                style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const Spacer(),
               if (hasValue)
@@ -414,22 +431,25 @@ class _AnnotateVideoFieldState extends State<AnnotateVideoField> {
   }
 
   Future<void> _initController() async {
-    if (widget.field.value.value != null && widget.field.value.value is Uint8List) {
+    if (widget.field.value.value != null &&
+        widget.field.value.value is Uint8List) {
       final bytes = widget.field.value.value as Uint8List;
       final tempDir = await getTemporaryDirectory();
-      final tempFile = File('${tempDir.path}/temp_video_${DateTime.now().millisecondsSinceEpoch}.mp4');
+      final tempFile = File(
+        '${tempDir.path}/temp_video_${DateTime.now().millisecondsSinceEpoch}.mp4',
+      );
       await tempFile.writeAsBytes(bytes);
 
       final oldController = _controller;
       _controller = VideoPlayerController.file(tempFile);
-      
+
       try {
         await _controller!.initialize();
         setState(() {});
       } catch (e) {
         debugPrint('Error initializing video controller: $e');
       }
-      
+
       if (oldController != null) {
         await oldController.dispose();
       }
@@ -458,7 +478,9 @@ class _AnnotateVideoFieldState extends State<AnnotateVideoField> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final hasValue = widget.field.value.value != null && widget.field.value.value is Uint8List;
+    final hasValue =
+        widget.field.value.value != null &&
+        widget.field.value.value is Uint8List;
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -466,7 +488,9 @@ class _AnnotateVideoFieldState extends State<AnnotateVideoField> {
         color: theme.colorScheme.surfaceContainerLow,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: hasValue ? theme.colorScheme.primary : theme.colorScheme.outlineVariant,
+          color: hasValue
+              ? theme.colorScheme.primary
+              : theme.colorScheme.outlineVariant,
         ),
       ),
       child: Column(
@@ -478,7 +502,9 @@ class _AnnotateVideoFieldState extends State<AnnotateVideoField> {
               const SizedBox(width: 8),
               Text(
                 widget.field.name.toTitleCase(),
-                style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const Spacer(),
               if (hasValue)
@@ -488,7 +514,9 @@ class _AnnotateVideoFieldState extends State<AnnotateVideoField> {
           const SizedBox(height: 8),
           Text(widget.field.description, style: theme.textTheme.bodySmall),
           const SizedBox(height: 16),
-          if (hasValue && _controller != null && _controller!.value.isInitialized)
+          if (hasValue &&
+              _controller != null &&
+              _controller!.value.isInitialized)
             Padding(
               padding: const EdgeInsets.only(bottom: 16.0),
               child: ClipRRect(
@@ -499,16 +527,23 @@ class _AnnotateVideoFieldState extends State<AnnotateVideoField> {
                     alignment: Alignment.bottomCenter,
                     children: [
                       VideoPlayer(_controller!),
-                      VideoProgressIndicator(_controller!, allowScrubbing: true),
+                      VideoProgressIndicator(
+                        _controller!,
+                        allowScrubbing: true,
+                      ),
                       Center(
                         child: IconButton(
                           onPressed: () {
                             setState(() {
-                              _controller!.value.isPlaying ? _controller!.pause() : _controller!.play();
+                              _controller!.value.isPlaying
+                                  ? _controller!.pause()
+                                  : _controller!.play();
                             });
                           },
                           icon: Icon(
-                            _controller!.value.isPlaying ? Icons.pause : Icons.play_arrow,
+                            _controller!.value.isPlaying
+                                ? Icons.pause
+                                : Icons.play_arrow,
                             size: 64,
                             color: Colors.white70,
                           ),
@@ -520,10 +555,7 @@ class _AnnotateVideoFieldState extends State<AnnotateVideoField> {
               ),
             )
           else if (hasValue)
-             const Padding(
-               padding: EdgeInsets.all(16.0),
-               child: Center(child: CircularProgressIndicator()),
-             ),
+            const Padding(padding: EdgeInsets.all(16.0), child: LoadingCard()),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [

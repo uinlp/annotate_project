@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:uinlp_annotate/components/status_card.dart';
 import 'package:uinlp_annotate/features/annotate_task/bloc/annotate_task_bloc.dart';
 import 'package:uinlp_annotate/models/annotate_task.dart';
 
@@ -40,7 +41,7 @@ class AnnotateEditorGridView extends StatelessWidget {
                     },
                     builder: (context, task) {
                       if (task == null) {
-                        return const Center(child: CircularProgressIndicator());
+                        return LoadingCard();
                       }
                       return GridView.builder(
                         padding: EdgeInsets.all(8),

@@ -8,10 +8,12 @@ from internal.database.models.shared import ModalityTypeEnum, S3UrlModel
 from .datasets import DatasetsRepository
 import os
 import boto3
-from boto3.dynamodb.conditions import Key
+from boto3.dynamodb.conditions import Key, Attr
 
 
 class AssetsRepository:
+    ASSETS_PUBLISHES_LIMIT = 1
+
     def __init__(self):
         assets_table_name = os.environ["ASSETS_TABLE_NAME"]
         publishes_table_name = os.environ["PUBLISHES_TABLE_NAME"]
@@ -24,13 +26,18 @@ class AssetsRepository:
         self.publishes_table = self.dynamodb.Table(publishes_table_name)
 
     def list_assets(self, modality: ModalityTypeEnum | None = None) -> list[AssetModel]:
+        filter_expression = (
+            Attr("total_publishes").lt(self.ASSETS_PUBLISHES_LIMIT)
+            | Attr("total_publishes").not_exists()
+        )
         if modality:
             response = self.assets_table.query(
                 IndexName="modality-index",
                 KeyConditionExpression=Key("modality").eq(modality.value),
+                FilterExpression=filter_expression,
             )
         else:
-            response = self.assets_table.scan()
+            response = self.assets_table.scan(FilterExpression=filter_expression)
         items = response["Items"]
         return [AssetModel(**item) for item in items]
 
@@ -87,17 +94,6 @@ class AssetsRepository:
         return S3UrlModel(url=url, expires_in=3600)
 
     def publish_asset(self, model: AssetPublishCreateModel):
-        # asset = self.get_asset(model.asset_id)
-        # asset.publishers.append(model.publisher_id)
-        # self.assets_table.put_item(Item=asset.model_dump(mode="json"))
-        # self.publishes_table.put_item(
-        #     Item=AssetPublishModel(
-        #         **{
-        #             **model.model_dump(mode="json"),
-        #             "publish_key": f"{model.asset_id}/{model.publisher_id}.zip",
-        #         }
-        #     ).model_dump(mode="json")
-        # )
         self.publishes_table.update_item(
             Key={"asset_id": model.asset_id, "publisher_id": model.publisher_id},
             UpdateExpression="SET is_published = :val",

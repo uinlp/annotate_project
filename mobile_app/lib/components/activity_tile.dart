@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:uinlp_annotate/components/status_card.dart';
+import 'package:uinlp_annotate/features/annotate_task/screens/annotate_editor_screen.dart';
 import 'package:uinlp_annotate/models/annotate_task.dart';
 import 'package:uinlp_annotate/utilities/helper.dart';
 
@@ -7,12 +10,10 @@ class ActivityTile extends StatelessWidget {
   const ActivityTile({
     super.key,
     required this.task,
-    this.onTap,
     this.margin = const .symmetric(horizontal: 16, vertical: 8),
   });
 
   final AnnotateTaskModel task;
-  final VoidCallback? onTap;
   final EdgeInsetsGeometry margin;
 
   @override
@@ -67,7 +68,19 @@ class ActivityTile extends StatelessWidget {
             ),
           ],
         ),
-        onTap: onTap,
+        onTap: () {
+          if (task.status == TaskStatusEnum.published) {
+            showInfoDialog(
+              context,
+              "This task is published and cannot be edited.",
+            );
+            return;
+          }
+          context.goNamed(
+            AnnotateEditorScreen.routeName,
+            queryParameters: {AnnotateEditorScreen.idQueryParam: task.id},
+          );
+        },
       ),
     );
   }
@@ -76,9 +89,9 @@ class ActivityTile extends StatelessWidget {
     Color color;
     String label;
     switch (status) {
-      case TaskStatusEnum.completed:
+      case TaskStatusEnum.published:
         color = Colors.green;
-        label = "Completed";
+        label = "Published";
         break;
       case TaskStatusEnum.inProgress:
         color = Colors.blue;

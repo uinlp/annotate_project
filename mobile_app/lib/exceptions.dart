@@ -9,7 +9,7 @@ class RepositoryException implements Exception {
     this.type = RepositoryExceptionType.unknown,
   });
 
-  String get description => switch (type) {
+  String get title => switch (type) {
     RepositoryExceptionType.unknown => "Unknown error",
   };
 

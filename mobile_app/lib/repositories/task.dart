@@ -135,8 +135,9 @@ final class TaskRepository extends BaseRepository {
     final outputsDir = Directory("${taskPath.path}/outputs");
     if (await outputsDir.exists()) {
       debugPrint("Adding outputs directory contents to archive");
-      final List<FileSystemEntity> entities =
-          await outputsDir.list(recursive: true).toList();
+      final List<FileSystemEntity> entities = await outputsDir
+          .list(recursive: true)
+          .toList();
       for (var entity in entities) {
         if (entity is File) {
           // Calculate relative path from taskPath and ensure forward slashes

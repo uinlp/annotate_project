@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:uinlp_annotate/components/activity_tile.dart';
+import 'package:uinlp_annotate/components/status_card.dart';
 import 'package:uinlp_annotate/features/annotate_task/bloc/annotate_task_bloc.dart';
 import 'package:uinlp_annotate/features/annotate_task/screens/annotate_editor_screen.dart';
 import 'package:uinlp_annotate/utilities/status.dart';
@@ -18,10 +19,10 @@ class RecentTasksScreen extends StatelessWidget {
       body: BlocBuilder<AnnotateTaskBloc, AnnotateTaskState>(
         builder: (context, state) {
           if (state.status is LoadingStatus) {
-            return const Center(child: CircularProgressIndicator());
+            return LoadingCard();
           }
           if (state.tasks.isEmpty) {
-            return Center(child: Text("No recent tasks"));
+            return ErrorCard(title: "Error", message: "No recent tasks");
           }
           return GridView.extent(
             padding: const EdgeInsets.all(16),
@@ -35,18 +36,7 @@ class RecentTasksScreen extends StatelessWidget {
             physics: const NeverScrollableScrollPhysics(),
             children: List.generate(state.tasks.length, (index) {
               final task = state.tasks[index];
-              return ActivityTile(
-                task: task,
-                margin: .zero,
-                onTap: () {
-                  context.goNamed(
-                    AnnotateEditorScreen.routeName,
-                    queryParameters: {
-                      AnnotateEditorScreen.idQueryParam: task.id,
-                    },
-                  );
-                },
-              );
+              return ActivityTile(task: task, margin: .zero);
             }),
           );
         },

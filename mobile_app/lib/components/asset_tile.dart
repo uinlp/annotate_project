@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:uinlp_annotate/features/annotate_task/bloc/annotate_task_bloc.dart';
 import 'package:uinlp_annotate/models/annotate_task.dart';
 import 'package:uinlp_annotate/utilities/helper.dart';
 
@@ -67,7 +69,13 @@ class AssetTile extends StatelessWidget {
             ),
           ],
         ),
-        onTap: onTap,
+        onTap: () {
+          showModalBottomSheet(
+            context: context,
+            showDragHandle: true,
+            builder: (context) => AnnotateAssetModal(asset: asset),
+          );
+        },
       ),
     );
   }
@@ -76,9 +84,9 @@ class AssetTile extends StatelessWidget {
     Color color;
     String label;
     switch (status) {
-      case TaskStatusEnum.completed:
+      case TaskStatusEnum.published:
         color = Colors.green;
-        label = "Completed";
+        label = "Published";
         break;
       case TaskStatusEnum.inProgress:
         color = Colors.blue;
@@ -101,6 +109,128 @@ class AssetTile extends StatelessWidget {
         style: theme.textTheme.labelSmall?.copyWith(
           color: color,
           fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+  }
+}
+
+class AnnotateAssetModal extends StatelessWidget {
+  const AnnotateAssetModal({super.key, required this.asset});
+
+  final AnnotateAssetModel asset;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              children: [
+                CircleAvatar(
+                  backgroundColor: getModalityColor(
+                    asset.modality,
+                  ).withAlpha(25),
+                  child: Icon(
+                    getModalityIcon(asset.modality),
+                    color: getModalityColor(asset.modality),
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        asset.name,
+                        style: theme.textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        "Created: ${DateFormat.yMMMd().format(asset.createdAt)}",
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 24),
+            Text(
+              "Description",
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              asset.description,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+            const SizedBox(height: 24),
+            Text(
+              "Annotation Modalities",
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                for (var modality in asset.modalitySet)
+                  Chip(
+                    label: Text(modality),
+                    side: BorderSide(color: theme.colorScheme.outlineVariant),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 24),
+            Text(
+              "Tags",
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                for (var tag in asset.tags)
+                  Chip(
+                    label: Text(tag.toTitleCase()),
+                    side: BorderSide(color: theme.colorScheme.outlineVariant),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 32),
+            FilledButton.icon(
+              onPressed: () {
+                Navigator.pop(context);
+                context.read<AnnotateTaskBloc>().add(
+                  CreateAnnotateTaskEvent(asset: asset),
+                );
+              },
+              icon: const Icon(Icons.play_arrow),
+              label: const Text("Start Annotating"),
+              style: FilledButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+              ),
+            ),
+            const SizedBox(height: 16),
+          ],
         ),
       ),
     );

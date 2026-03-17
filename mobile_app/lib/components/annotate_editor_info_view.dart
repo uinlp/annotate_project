@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:uinlp_annotate/components/status_card.dart';
 import 'package:uinlp_annotate/features/annotate_task/bloc/annotate_task_bloc.dart';
 import 'package:uinlp_annotate/models/annotate_task.dart';
 import 'package:uinlp_annotate/utilities/helper.dart';
@@ -32,7 +33,7 @@ class AnnotateEditorInfoView extends StatelessWidget {
             builder: (context, state) {
               final task = state.tasks.where((e) => e.id == taskId).firstOrNull;
               if (task == null) {
-                return const Center(child: CircularProgressIndicator());
+                return LoadingCard();
               }
               return Column(
                 children: [

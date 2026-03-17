@@ -3,7 +3,7 @@ import 'dart:io';
 
 import '../repositories/base.dart';
 
-enum TaskStatusEnum { todo, inProgress, completed }
+enum TaskStatusEnum { todo, inProgress, published }
 
 enum TaskTypeEnum { imageToText, textToText }
 
@@ -185,6 +185,36 @@ class AnnotateTaskModel {
       'annotate_fields': annotateFields.map((e) => e.toJson()).toList(),
       'tags': tags,
     };
+  }
+
+  AnnotateTaskModel copyWith({
+    String? id,
+    String? datasetId,
+    String? datasetBatchKey,
+    String? name,
+    String? description,
+    AnnotateModalityEnum? modality,
+    TaskStatusEnum? status,
+    List<String>? dataIds,
+    DateTime? lastUpdated,
+    List<AnnotateFieldModel>? annotateFields,
+    Map<String, Map<String, dynamic>>? commits,
+    List<String>? tags,
+  }) {
+    return AnnotateTaskModel(
+      id: id ?? this.id,
+      datasetId: datasetId ?? this.datasetId,
+      datasetBatchKey: datasetBatchKey ?? this.datasetBatchKey,
+      name: name ?? this.name,
+      description: description ?? this.description,
+      modality: modality ?? this.modality,
+      status: status ?? this.status,
+      dataIds: dataIds ?? this.dataIds,
+      lastUpdated: lastUpdated ?? this.lastUpdated,
+      annotateFields: annotateFields ?? this.annotateFields,
+      commits: commits ?? this.commits,
+      tags: tags ?? this.tags,
+    );
   }
 
   Set<String> get modalitySet {

@@ -43,7 +43,7 @@ base class BaseRepository {
         onResponse: (response, handler) async {
           debugPrint("Response: ${response.statusCode}");
           if (response.statusCode == 401 &&
-              accessToken != null &&
+              // accessToken != null &&
               accessTokenRetriever != null) {
             debugPrint("Refreshing access token");
             accessToken = await accessTokenRetriever();

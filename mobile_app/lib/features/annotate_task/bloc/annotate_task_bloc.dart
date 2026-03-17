@@ -78,11 +78,20 @@ class AnnotateTaskBloc extends Bloc<AnnotateTaskEvent, AnnotateTaskState> {
       debugPrint("Publishing annotate task");
       emit(state.copyWith(status: LoadingStatus(event: event)));
       try {
-        await taskRepo.publishTask(task: event.task);
+        final publishedTask = event.task.copyWith(
+          status: TaskStatusEnum.published,
+        );
+        await taskRepo.publishTask(task: publishedTask);
         debugPrint("Published annotate task: ${event.task.id}");
         emit(
           state.copyWith(
             status: SuccessStatus(data: event.task.id, event: event),
+            tasks: state.tasks.map((task) {
+              if (task.id == publishedTask.id) {
+                return publishedTask;
+              }
+              return task;
+            }).toList(),
           ),
         );
       } catch (e) {

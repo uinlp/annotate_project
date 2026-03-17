@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:uinlp_annotate/components/asset_tile.dart';
+import 'package:uinlp_annotate/components/status_card.dart';
 import 'package:uinlp_annotate/features/annotate_task/bloc/annotate_task_bloc.dart';
 import 'package:uinlp_annotate/features/annotate_task/screens/annotate_editor_screen.dart';
 import 'package:uinlp_annotate/models/annotate_task.dart';
@@ -28,19 +29,7 @@ class AnnotateAssetScreen extends StatelessWidget {
         },
         listener: (context, state) {
           if (state.status is LoadingStatus) {
-            showDialog(
-              context: context,
-              barrierDismissible: false,
-              builder: (context) => const Center(
-                child: Card(
-                  elevation: 0,
-                  child: Padding(
-                    padding: EdgeInsets.all(16.0),
-                    child: CircularProgressIndicator(),
-                  ),
-                ),
-              ),
-            );
+            showLoadingDialog(context);
           }
           if (state.status is SuccessStatus) {
             context.goNamed(
@@ -52,20 +41,10 @@ class AnnotateAssetScreen extends StatelessWidget {
           }
           if (state.status is ErrorStatus) {
             final errorStatus = state.status as ErrorStatus;
-            showDialog(
-              context: context,
-              builder: (context) => AlertDialog(
-                title: const Text("Error"),
-                content: Text(
-                  "Failed to create annotate task:\n${errorStatus.data.message}",
-                ),
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: const Text("OK"),
-                  ),
-                ],
-              ),
+            showErrorDialog(
+              context,
+              "Error",
+              "Failed to create annotate task:\n${errorStatus.data.message}",
             );
           }
         },
@@ -77,16 +56,17 @@ class AnnotateAssetScreen extends StatelessWidget {
           ),
           builder: (context, asyncSnapshot) {
             if (asyncSnapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
+              return LoadingCard();
             }
             if (asyncSnapshot.hasError) {
               debugPrintStack(stackTrace: asyncSnapshot.stackTrace);
-              return Center(
-                child: Text("Failed to load assets: ${asyncSnapshot.error}"),
+              return ErrorCard(
+                title: "Error",
+                message: "Failed to load assets: ${asyncSnapshot.error}",
               );
             }
             if (asyncSnapshot.data!.isEmpty) {
-              return const Center(child: Text("No assets found"));
+              return ErrorCard(title: "Oops", message: "No assets found");
             }
             return Column(
               crossAxisAlignment: .stretch,
@@ -114,18 +94,7 @@ class AnnotateAssetScreen extends StatelessWidget {
                         (MediaQuery.sizeOf(context).width < 850 ? 125 : 250),
                     children: [
                       for (final asset in asyncSnapshot.data!)
-                        AssetTile(
-                          asset: asset,
-                          margin: .zero,
-                          onTap: () {
-                            showModalBottomSheet(
-                              context: context,
-                              showDragHandle: true,
-                              builder: (context) =>
-                                  AnnotateAssetModal(asset: asset),
-                            );
-                          },
-                        ),
+                        AssetTile(asset: asset, margin: .zero),
                     ],
                   ),
                 ),
@@ -147,127 +116,5 @@ class AnnotateAssetScreen extends StatelessWidget {
         .firstWhere((e) => e.repr == modality)
         .repr
         .toTitleCase(sep: '_');
-  }
-}
-
-class AnnotateAssetModal extends StatelessWidget {
-  const AnnotateAssetModal({super.key, required this.asset});
-
-  final AnnotateAssetModel asset;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Row(
-              children: [
-                CircleAvatar(
-                  backgroundColor: getModalityColor(
-                    asset.modality,
-                  ).withAlpha(25),
-                  child: Icon(
-                    getModalityIcon(asset.modality),
-                    color: getModalityColor(asset.modality),
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        asset.name,
-                        style: theme.textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Text(
-                        "Created: ${DateFormat.yMMMd().format(asset.createdAt)}",
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 24),
-            Text(
-              "Description",
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              asset.description,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-            ),
-            const SizedBox(height: 24),
-            Text(
-              "Annotation Modalities",
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                for (var modality in asset.modalitySet)
-                  Chip(
-                    label: Text(modality),
-                    side: BorderSide(color: theme.colorScheme.outlineVariant),
-                  ),
-              ],
-            ),
-            const SizedBox(height: 24),
-            Text(
-              "Tags",
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                for (var tag in asset.tags)
-                  Chip(
-                    label: Text(tag.toTitleCase()),
-                    side: BorderSide(color: theme.colorScheme.outlineVariant),
-                  ),
-              ],
-            ),
-            const SizedBox(height: 32),
-            FilledButton.icon(
-              onPressed: () {
-                Navigator.pop(context);
-                context.read<AnnotateTaskBloc>().add(
-                  CreateAnnotateTaskEvent(asset: asset),
-                );
-              },
-              icon: const Icon(Icons.play_arrow),
-              label: const Text("Start Annotating"),
-              style: FilledButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-              ),
-            ),
-            const SizedBox(height: 16),
-          ],
-        ),
-      ),
-    );
   }
 }

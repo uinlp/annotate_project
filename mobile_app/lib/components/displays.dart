@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:uinlp_annotate/components/status_card.dart';
 import 'package:video_player/video_player.dart';
 
 class AnnotateImageDisplay extends StatelessWidget {
@@ -191,7 +192,7 @@ class _AnnotateVideoDisplayState extends State<AnnotateVideoDisplay> {
   @override
   Widget build(BuildContext context) {
     if (!_initialized) {
-      return const Center(child: CircularProgressIndicator());
+      return LoadingCard();
     }
 
     return AspectRatio(

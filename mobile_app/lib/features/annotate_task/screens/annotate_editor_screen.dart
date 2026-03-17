@@ -7,9 +7,12 @@ import 'package:uinlp_annotate/components/annotate_editor_grid_view.dart';
 import 'package:uinlp_annotate/components/annotate_editor_info_view.dart';
 import 'package:uinlp_annotate/components/displays.dart';
 import 'package:uinlp_annotate/components/fields.dart';
+import 'package:uinlp_annotate/components/status_card.dart';
+import 'package:uinlp_annotate/exceptions.dart';
 import 'package:uinlp_annotate/features/annotate_task/bloc/annotate_task_bloc.dart';
 import 'package:uinlp_annotate/features/main/screens/dashboard_screen.dart';
 import 'package:uinlp_annotate/models/annotate_task.dart';
+import 'package:uinlp_annotate/utilities/status.dart';
 
 class AnnotateEditorScreen extends StatefulWidget {
   const AnnotateEditorScreen({super.key, required this.routerState});
@@ -182,220 +185,259 @@ class _AnnotateEditorScreenState extends State<AnnotateEditorScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Scaffold(
-      appBar: AppBar(
-        title: ValueListenableBuilder(
-          valueListenable: currentDataIndex,
-          builder: (context, value, child) {
-            return Text("Annotate Editor [${currentDataIndex.value + 1}]");
-          },
-        ),
-        actions: [
-          Builder(
-            builder: (context) {
-              return IconButton(
+    return BlocListener<AnnotateTaskBloc, AnnotateTaskState>(
+      listener: (context, state) {
+        if (state.status is LoadingStatus) {
+          final event = state.status.event;
+          String message = "Loading...";
+          if (event is PublishAnnotateTaskEvent) {
+            message = "Publishing task...";
+          }
+          showLoadingDialog(context, message: message);
+        } else if (state.status is ErrorStatus) {
+          final error = state.status.data;
+          if (error is RepositoryException) {
+            showErrorDialog(context, error.title, error.message);
+          } else {
+            showErrorDialog(context, "Error", error.toString());
+          }
+        } else if (state.status is SuccessStatus &&
+            state.status.event is PublishAnnotateTaskEvent) {
+          showSuccessDialog(
+            context,
+            "Task published successfully",
+            actions: [
+              TextButton(
                 onPressed: () {
-                  final scaffold = Scaffold.of(context);
-                  if (scaffold.hasEndDrawer) {
-                    scaffold.openEndDrawer();
-                  }
+                  context.pop();
+                  context.pop();
                 },
-                icon: Icon(Icons.info_outline),
-              );
-            },
-          ),
-        ],
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            spacing: 24,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              ValueListenableBuilder(
-                valueListenable: currentDataIndex,
-                builder: (context, value, child) {
-                  // state.tasks.where((e) => e.id == taskId).firstOrNull
-                  final task = context
-                      .read<AnnotateTaskBloc>()
-                      .state
-                      .tasks
-                      .where((e) => e.id == taskId)
-                      .firstOrNull;
-                  if (task == null) {
-                    return Text(
-                      "Task not found",
-                      style: theme.textTheme.headlineMedium,
-                    );
-                  }
-                  return FutureBuilder(
-                    future: task.loadDataFile(value),
-                    builder: (context, asyncSnapshot) {
-                      if (asyncSnapshot.hasError) {
-                        return Text(
-                          "Error loading data ${asyncSnapshot.error}",
-                          style: theme.textTheme.headlineMedium,
-                        );
-                      }
-                      if (!asyncSnapshot.hasData) {
-                        return const CircularProgressIndicator();
-                      }
-                      switch (task.modality) {
-                        case AnnotateModalityEnum.text:
-                          return AnnotateTextDisplay(file: asyncSnapshot.data!);
-                        case AnnotateModalityEnum.audio:
-                          return AnnotateAudioDisplay(
-                            file: asyncSnapshot.data!,
-                          );
-                        case AnnotateModalityEnum.image:
-                          return AnnotateImageDisplay(
-                            file: asyncSnapshot.data!,
-                          );
-                        case AnnotateModalityEnum.video:
-                          return AnnotateVideoDisplay(
-                            file: asyncSnapshot.data!,
-                          );
-                      }
-                    },
-                  );
-                },
+                child: Text("OK"),
               ),
-              for (var field in fields)
-                switch (field.modality) {
-                  AnnotateModalityEnum.text => AnnotateTextField(
-                    key: ValueKey(field.name),
-                    field: field,
-                    theme: theme,
-                  ),
-                  AnnotateModalityEnum.audio => AnnotateAudioField(
-                    key: ValueKey(field.name),
-                    field: field,
-                  ),
-                  AnnotateModalityEnum.image => AnnotateImageField(
-                    key: ValueKey(field.name),
-                    field: field,
-                  ),
-                  AnnotateModalityEnum.video => AnnotateVideoField(
-                    key: ValueKey(field.name),
-                    field: field,
-                  ),
-                },
             ],
+          );
+        } else {
+          hideLoadingDialog(context);
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: ValueListenableBuilder(
+            valueListenable: currentDataIndex,
+            builder: (context, value, child) {
+              return Text("Annotate Editor [${currentDataIndex.value + 1}]");
+            },
           ),
-        ),
-      ),
-      drawer: ValueListenableBuilder(
-        valueListenable: currentDataIndex,
-        builder: (context, value, child) {
-          return AnnotateEditorGridView(
-            taskId: taskId,
-            currentDataIndex: currentDataIndex.value,
-            onDataIndexPressed: (index) {
-              goto(index);
-              context.pop();
-            },
-          );
-        },
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          final enablePublish = canBePublished();
-          showModalBottomSheet(
-            context: context,
-            isScrollControlled: true,
-            showDragHandle: true,
-            builder: (context) {
-              return Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text("More Actions", style: theme.textTheme.titleLarge),
-                  ListTile(
-                    leading: const Icon(Icons.save),
-                    title: const Text("Save"),
-                    onTap: () {
-                      saveCurrentAnnotations();
-                      context.pop();
-                    },
-                  ),
-                  ListTile(
-                    leading: const Icon(Icons.arrow_forward),
-                    title: const Text("Next"),
-                    onTap: () {
-                      next();
-                      context.pop();
-                    },
-                  ),
-                  ListTile(
-                    leading: const Icon(Icons.arrow_back),
-                    title: const Text("Previous"),
-                    onTap: () {
-                      previous();
-                      context.pop();
-                    },
-                  ),
-                  ListTile(
-                    leading: const Icon(Icons.logout_sharp),
-                    title: const Text("Exit"),
-                    onTap: () {
-                      context.goNamed(DashboardScreen.routeName);
-                    },
-                  ),
-                  ListTile(
-                    leading: const Icon(Icons.logout),
-                    title: const Text("Save & Exit"),
-                    onTap: () async {
-                      final saved = await saveCurrentAnnotations();
-                      context.pop();
-                      if (saved) {
-                        context.goNamed(DashboardScreen.routeName);
-                      }
-                    },
-                  ),
-                  ListTile(
-                    leading: const Icon(Icons.publish),
-                    title: const Text("Publish"),
-                    onTap: () {
-                      publishTask();
-                      context.pop();
-                    },
-                    // enabled: enablePublish,
-                  ),
-                ],
-              );
-            },
-          );
-        },
-        child: const Icon(Icons.keyboard_arrow_up),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      bottomNavigationBar: Container(
-        color: theme.colorScheme.surfaceContainerLow,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            BottomActionButton(
-              icon: Icons.arrow_back,
-              label: "Previous",
-              onPressed: () {
-                previous();
-              },
-            ),
-            BottomActionButton(
-              icon: Icons.arrow_forward,
-              label: "Save & Next",
-              onPressed: () async {
-                final saved = await saveCurrentAnnotations();
-                if (saved) {
-                  next();
-                }
+          actions: [
+            Builder(
+              builder: (context) {
+                return IconButton(
+                  onPressed: () {
+                    final scaffold = Scaffold.of(context);
+                    if (scaffold.hasEndDrawer) {
+                      scaffold.openEndDrawer();
+                    }
+                  },
+                  icon: Icon(Icons.info_outline),
+                );
               },
             ),
           ],
         ),
+        body: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              spacing: 24,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                ValueListenableBuilder(
+                  valueListenable: currentDataIndex,
+                  builder: (context, value, child) {
+                    // state.tasks.where((e) => e.id == taskId).firstOrNull
+                    final task = context
+                        .read<AnnotateTaskBloc>()
+                        .state
+                        .tasks
+                        .where((e) => e.id == taskId)
+                        .firstOrNull;
+                    if (task == null) {
+                      return Text(
+                        "Task not found",
+                        style: theme.textTheme.headlineMedium,
+                      );
+                    }
+                    return FutureBuilder(
+                      future: task.loadDataFile(value),
+                      builder: (context, asyncSnapshot) {
+                        if (asyncSnapshot.hasError) {
+                          return ErrorCard(
+                            title: "Error",
+                            message:
+                                "Failed to load data: ${asyncSnapshot.error}",
+                          );
+                        }
+                        if (!asyncSnapshot.hasData) {
+                          return LoadingCard();
+                        }
+                        switch (task.modality) {
+                          case AnnotateModalityEnum.text:
+                            return AnnotateTextDisplay(
+                              file: asyncSnapshot.data!,
+                            );
+                          case AnnotateModalityEnum.audio:
+                            return AnnotateAudioDisplay(
+                              file: asyncSnapshot.data!,
+                            );
+                          case AnnotateModalityEnum.image:
+                            return AnnotateImageDisplay(
+                              file: asyncSnapshot.data!,
+                            );
+                          case AnnotateModalityEnum.video:
+                            return AnnotateVideoDisplay(
+                              file: asyncSnapshot.data!,
+                            );
+                        }
+                      },
+                    );
+                  },
+                ),
+                for (var field in fields)
+                  switch (field.modality) {
+                    AnnotateModalityEnum.text => AnnotateTextField(
+                      key: ValueKey(field.name),
+                      field: field,
+                      theme: theme,
+                    ),
+                    AnnotateModalityEnum.audio => AnnotateAudioField(
+                      key: ValueKey(field.name),
+                      field: field,
+                    ),
+                    AnnotateModalityEnum.image => AnnotateImageField(
+                      key: ValueKey(field.name),
+                      field: field,
+                    ),
+                    AnnotateModalityEnum.video => AnnotateVideoField(
+                      key: ValueKey(field.name),
+                      field: field,
+                    ),
+                  },
+              ],
+            ),
+          ),
+        ),
+        drawer: ValueListenableBuilder(
+          valueListenable: currentDataIndex,
+          builder: (context, value, child) {
+            return AnnotateEditorGridView(
+              taskId: taskId,
+              currentDataIndex: currentDataIndex.value,
+              onDataIndexPressed: (index) {
+                goto(index);
+                context.pop();
+              },
+            );
+          },
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            final enablePublish = canBePublished();
+            showModalBottomSheet(
+              context: context,
+              isScrollControlled: true,
+              showDragHandle: true,
+              builder: (context) {
+                return Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text("More Actions", style: theme.textTheme.titleLarge),
+                    ListTile(
+                      leading: const Icon(Icons.save),
+                      title: const Text("Save"),
+                      onTap: () {
+                        saveCurrentAnnotations();
+                        context.pop();
+                      },
+                    ),
+                    ListTile(
+                      leading: const Icon(Icons.arrow_forward),
+                      title: const Text("Next"),
+                      onTap: () {
+                        next();
+                        context.pop();
+                      },
+                    ),
+                    ListTile(
+                      leading: const Icon(Icons.arrow_back),
+                      title: const Text("Previous"),
+                      onTap: () {
+                        previous();
+                        context.pop();
+                      },
+                    ),
+                    ListTile(
+                      leading: const Icon(Icons.logout_sharp),
+                      title: const Text("Exit"),
+                      onTap: () {
+                        context.goNamed(DashboardScreen.routeName);
+                      },
+                    ),
+                    ListTile(
+                      leading: const Icon(Icons.logout),
+                      title: const Text("Save & Exit"),
+                      onTap: () async {
+                        final saved = await saveCurrentAnnotations();
+                        context.pop();
+                        if (saved) {
+                          context.goNamed(DashboardScreen.routeName);
+                        }
+                      },
+                    ),
+                    ListTile(
+                      leading: const Icon(Icons.publish),
+                      title: const Text("Publish"),
+                      onTap: () {
+                        publishTask();
+                        context.pop();
+                      },
+                      enabled: enablePublish,
+                    ),
+                  ],
+                );
+              },
+            );
+          },
+          child: const Icon(Icons.keyboard_arrow_up),
+        ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+        bottomNavigationBar: Container(
+          color: theme.colorScheme.surfaceContainerLow,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              BottomActionButton(
+                icon: Icons.arrow_back,
+                label: "Previous",
+                onPressed: () {
+                  previous();
+                },
+              ),
+              BottomActionButton(
+                icon: Icons.arrow_forward,
+                label: "Save & Next",
+                onPressed: () async {
+                  final saved = await saveCurrentAnnotations();
+                  if (saved) {
+                    next();
+                  }
+                },
+              ),
+            ],
+          ),
+        ),
+        endDrawer: AnnotateEditorInfoView(taskId: taskId),
       ),
-      endDrawer: AnnotateEditorInfoView(taskId: taskId),
     );
   }
 }

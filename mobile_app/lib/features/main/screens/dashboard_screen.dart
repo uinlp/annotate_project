@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:uinlp_annotate/components/activity_tile.dart';
+import 'package:uinlp_annotate/components/status_card.dart';
 import 'package:uinlp_annotate/features/annotate_task/bloc/annotate_task_bloc.dart';
 import 'package:uinlp_annotate/features/annotate_task/screens/annotate_asset_screen.dart';
 import 'package:uinlp_annotate/features/annotate_task/screens/annotate_editor_screen.dart';
@@ -108,7 +109,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       future: Amplify.Auth.getCurrentUser(),
       builder: (context, asyncSnapshot) {
         if (!asyncSnapshot.hasData) {
-          return const Center(child: CircularProgressIndicator());
+          return LoadingCard();
         }
         return Text.rich(
           TextSpan(
@@ -327,13 +328,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return BlocBuilder<AnnotateTaskBloc, AnnotateTaskState>(
       builder: (context, state) {
         if (state.status is LoadingStatus) {
-          return SliverToBoxAdapter(
-            child: Center(child: CircularProgressIndicator()),
-          );
+          return SliverToBoxAdapter(child: LoadingCard());
         }
         if (state.tasks.isEmpty) {
           return SliverToBoxAdapter(
-            child: Center(child: Text("No recent tasks")),
+            child: ErrorCard(title: "Error", message: "No recent tasks"),
           );
         }
         return SliverToBoxAdapter(
@@ -349,18 +348,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             physics: const NeverScrollableScrollPhysics(),
             children: List.generate(min(state.tasks.length, 10), (index) {
               final task = state.tasks[index];
-              return ActivityTile(
-                task: task,
-                margin: .zero,
-                onTap: () {
-                  context.goNamed(
-                    AnnotateEditorScreen.routeName,
-                    queryParameters: {
-                      AnnotateEditorScreen.idQueryParam: task.id,
-                    },
-                  );
-                },
-              );
+              return ActivityTile(task: task, margin: .zero);
             }),
           ),
         );

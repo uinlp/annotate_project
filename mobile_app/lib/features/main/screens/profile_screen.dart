@@ -1,5 +1,6 @@
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:uinlp_annotate/components/status_card.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -53,7 +54,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Profile'),
@@ -66,7 +67,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ],
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? LoadingCard()
           : SingleChildScrollView(
               padding: const EdgeInsets.all(24.0),
               child: Column(
@@ -92,9 +93,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   Text(
                     _attributes
                             ?.firstWhere(
-                              (attr) => attr.userAttributeKey == AuthUserAttributeKey.email,
+                              (attr) =>
+                                  attr.userAttributeKey ==
+                                  AuthUserAttributeKey.email,
                               orElse: () => const AuthUserAttribute(
-                                  userAttributeKey: AuthUserAttributeKey.email, value: 'No email'),
+                                userAttributeKey: AuthUserAttributeKey.email,
+                                value: 'No email',
+                              ),
                             )
                             .value ??
                         'No email found',
@@ -119,9 +124,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       minimumSize: const Size.fromHeight(56),
                       backgroundColor: theme.colorScheme.errorContainer,
                       foregroundColor: theme.colorScheme.onErrorContainer,
-                    ).copyWith(
-                      elevation: ButtonStyleButton.allOrNull(0),
-                    ),
+                    ).copyWith(elevation: ButtonStyleButton.allOrNull(0)),
                   ),
                 ],
               ),
