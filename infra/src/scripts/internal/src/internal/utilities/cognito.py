@@ -30,17 +30,17 @@ def get_current_user(
             key,
             algorithms=["RS256"],
             audience=user_pool_client_id,
-            issuer=f"https://cognito-idp.{region}://{user_pool_id}",
+            issuer=f"https://cognito-idp.{region}.amazonaws.com/{user_pool_id}",
         )
 
         # 4. (Optional) Use Boto3 to get extra user info not in the token
         # This requires the 'aws.cognito.signin.user.admin' scope in the token
-        user_info = cognito_client.get_user(AccessToken=token)
+        # user_info = cognito_client.get_user(AccessToken=token)
 
         return {
             "username": payload.get("username"),
             "sub": payload.get("sub"),
-            "attributes": user_info.get("UserAttributes"),
+            # "attributes": user_info.get("UserAttributes"),
         }
 
     except (JWTError, Exception) as e:

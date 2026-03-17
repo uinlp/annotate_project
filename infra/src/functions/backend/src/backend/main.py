@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Depends
 from backend.api.v1 import router as v1_router
 from mangum import Mangum
 from aws_lambda_powertools.logging import Logger
@@ -8,7 +8,7 @@ from backend.settings import (
     COGNITO_CLIENT_ID,
     COGNITO_REDIRECT_URI,
 )
-from backend.dependencies import is_authenticated
+from backend.dependencies import is_authenticated, get_current_user_me
 
 logger = Logger()
 
@@ -33,6 +33,12 @@ app.add_middleware(SessionMiddleware, secret_key=SECRET_KEY or "")
 async def read_root(request: Request):
     logger.info(f"Hello: {request.scope.get('aws.event')}")
     return {"Hello": request.scope.get("aws.event")}
+
+
+@app.get("/user")
+async def get_user(request: Request, user: dict = Depends(get_current_user_me)):
+    print(request.scope)
+    return {"user": user}
 
 
 handler = Mangum(app)

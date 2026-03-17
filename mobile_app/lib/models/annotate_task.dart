@@ -202,7 +202,7 @@ class AnnotateAssetModel {
   final DateTime updatedAt;
   final List<AnnotateFieldModel> annotateFields;
   final List<String> tags;
-  final List<String> publishers;
+  final int totalPublishes;
 
   const AnnotateAssetModel({
     required this.id,
@@ -215,7 +215,7 @@ class AnnotateAssetModel {
     required this.updatedAt,
     required this.annotateFields,
     this.tags = const [],
-    this.publishers = const [],
+    this.totalPublishes = 0,
   });
 
   factory AnnotateAssetModel.fromJson(Map<String, dynamic> json) {
@@ -236,9 +236,7 @@ class AnnotateAssetModel {
           )
           .toList(),
       tags: json['tags'] != null ? List<String>.from(json['tags']) : [],
-      publishers: json['publishers'] != null
-          ? List<String>.from(json['publishers'])
-          : [],
+      totalPublishes: json['total_publishes'] ?? 0,
     );
   }
 

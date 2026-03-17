@@ -11,9 +11,8 @@ from backend.settings import (
 from internal.utilities.cognito import get_current_user
 
 # Cache JWKS to avoid frequent network calls
-JWKS_URL = (
-    f"https://cognito-idp.{AWS_REGION}://{COGNITO_USER_POOL_ID}/.well-known/jwks.json"
-)
+JWKS_URL = f"https://cognito-idp.{AWS_REGION}.amazonaws.com/{COGNITO_USER_POOL_ID}/.well-known/jwks.json"
+print("JWKS_URL: ", JWKS_URL)
 jwks = requests.get(JWKS_URL).json()["keys"]
 
 oauth2_scheme = OAuth2AuthorizationCodeBearer(
@@ -30,7 +29,7 @@ is_authenticated = Depends(oauth2_scheme)
 
 
 # Get current user from token
-async def get_current_user_me(token: str = Depends(oauth2_scheme)):
+def get_current_user_me(token: str = Depends(oauth2_scheme)):
     return get_current_user(
         token=token,
         jwks=jwks,
