@@ -13,6 +13,7 @@ import 'package:uinlp_annotate/features/annotate_task/screens/recent_tasks_scree
 import 'package:uinlp_annotate/features/main/screens/profile_screen.dart';
 import 'package:uinlp_annotate/models/annotate_task.dart';
 import 'package:uinlp_annotate/models/user_stats.dart';
+import 'package:uinlp_annotate/repositories/task.dart';
 import 'package:uinlp_annotate/repositories/user.dart';
 import 'package:uinlp_annotate/utilities/helper.dart';
 import 'package:uinlp_annotate/utilities/status.dart';
@@ -135,48 +136,70 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Widget _buildStatsSection(ThemeData theme) {
-    return FutureBuilder<UserStatsModel>(
-      future: context.read<UserRepository>().getUserStatsModel(),
+    return FutureBuilder<List<AnnotatePublishModel>>(
+      future: context.read<TaskRepository>().listMyPublishes(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
           return const Center(child: LinearProgressIndicator());
         }
         final stats = snapshot.data!;
-        return Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: theme.colorScheme.primaryContainer,
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _buildStatItem(
-                theme,
-                stats.tasksCompleted.toString(),
-                "Completed",
-                Icons.check_circle_outline,
+        return BlocBuilder<AnnotateTaskBloc, AnnotateTaskState>(
+          builder: (context, state) {
+            return Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.primaryContainer,
+                borderRadius: BorderRadius.circular(16),
               ),
-              _buildStatItem(
-                theme,
-                stats.tasksInProgress.toString(),
-                "In Progress",
-                Icons.pending_actions,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Annotate Stats",
+                    style: theme.textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      _buildStatItem(
+                        theme,
+                        stats.where((e) => e.isPublished).length.toString(),
+                        "Published",
+                        Icons.check_circle_outline,
+                      ),
+                      _buildStatItem(
+                        theme,
+                        stats.where((e) => e.isVerified).length.toString(),
+                        "Verified",
+                        Icons.verified_user_outlined,
+                      ),
+                      _buildStatItem(
+                        theme,
+                        state.tasksInProgress.toString(),
+                        "In Progress",
+                        Icons.pending_actions,
+                      ),
+                      // _buildStatItem(
+                      //   theme,
+                      //   "${stats.hoursSpent}h",
+                      //   "Hours",
+                      //   Icons.timer_outlined,
+                      // ),
+                      // _buildStatItem(
+                      //   theme,
+                      //   "${(stats.accuracy * 100).toInt()}%",
+                      //   "Accuracy",
+                      //   Icons.analytics_outlined,
+                      // ),
+                    ],
+                  ),
+                ],
               ),
-              _buildStatItem(
-                theme,
-                "${stats.hoursSpent}h",
-                "Hours",
-                Icons.timer_outlined,
-              ),
-              _buildStatItem(
-                theme,
-                "${(stats.accuracy * 100).toInt()}%",
-                "Accuracy",
-                Icons.analytics_outlined,
-              ),
-            ],
-          ),
+            );
+          },
         );
       },
     );
@@ -188,22 +211,27 @@ class _DashboardScreenState extends State<DashboardScreen> {
     String label,
     IconData icon,
   ) {
-    return Column(
+    return Row(
       children: [
-        Icon(icon, color: theme.colorScheme.primary, size: 28),
-        const SizedBox(height: 8),
-        Text(
-          value,
-          style: theme.textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.bold,
-            color: theme.colorScheme.onPrimaryContainer,
-          ),
-        ),
-        Text(
-          label,
-          style: theme.textTheme.labelMedium?.copyWith(
-            color: theme.colorScheme.onPrimaryContainer.withOpacity(0.7),
-          ),
+        Icon(icon, color: theme.colorScheme.primary, size: 48),
+        const SizedBox(width: 8),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              value,
+              style: theme.textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: theme.colorScheme.onPrimaryContainer,
+              ),
+            ),
+            Text(
+              label,
+              style: theme.textTheme.labelMedium?.copyWith(
+                color: theme.colorScheme.onPrimaryContainer.withOpacity(0.7),
+              ),
+            ),
+          ],
         ),
       ],
     );

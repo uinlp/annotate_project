@@ -1,3 +1,4 @@
+from internal.utilities.parser import make_id
 from pydantic import BaseModel, computed_field, Field
 from datetime import datetime
 
@@ -35,7 +36,7 @@ class AssetCreateModel(BaseModel):
     @computed_field
     @property
     def id(self) -> str:
-        return self.name.lower().replace(" ", "-")
+        return make_id(self.name)
 
     @computed_field
     @property

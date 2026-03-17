@@ -58,6 +58,12 @@ class AssetTile extends StatelessWidget {
             Row(
               children: [
                 // _buildStatusBadge(theme, asset.status),
+                Text(
+                  asset.tags.map((e) => e.toTitleCase()).join(", "),
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
                 const Spacer(),
                 Text(
                   DateFormat('MMM d, h:mm a').format(asset.updatedAt),

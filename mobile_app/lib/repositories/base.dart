@@ -42,11 +42,9 @@ base class BaseRepository {
         },
         onResponse: (response, handler) async {
           debugPrint("Response: ${response.statusCode}");
-          if (response.statusCode == 401 &&
-              // accessToken != null &&
-              accessTokenRetriever != null) {
+          if (response.statusCode == 401 && this.accessTokenRetriever != null) {
             debugPrint("Refreshing access token");
-            accessToken = await accessTokenRetriever();
+            accessToken = await this.accessTokenRetriever!();
             response.headers.add("Authorization", "Bearer $accessToken");
             handler.resolve(response);
           } else {

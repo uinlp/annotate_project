@@ -301,3 +301,47 @@ class S3UrlModel {
     return S3UrlModel(url: json['url'], expiresIn: json['expires_in']);
   }
 }
+
+class AnnotatePublishModel {
+  final String assetId;
+  final String publisherId;
+  final bool isVerified;
+  final bool isPublished;
+  final String publishKey;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+
+  const AnnotatePublishModel({
+    required this.assetId,
+    required this.publisherId,
+    required this.isVerified,
+    required this.isPublished,
+    required this.publishKey,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+
+  factory AnnotatePublishModel.fromJson(Map<String, dynamic> json) {
+    return AnnotatePublishModel(
+      assetId: json['asset_id'],
+      publisherId: json['publisher_id'],
+      isVerified: json['is_verified'],
+      isPublished: json['is_published'],
+      publishKey: json['publish_key'],
+      createdAt: DateTime.parse(json['created_at']),
+      updatedAt: DateTime.parse(json['updated_at']),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'asset_id': assetId,
+      'publisher_id': publisherId,
+      'is_verified': isVerified,
+      'is_published': isPublished,
+      'publish_key': publishKey,
+      'created_at': createdAt.toIso8601String(),
+      'updated_at': updatedAt.toIso8601String(),
+    };
+  }
+}

@@ -17,4 +17,10 @@ class AnnotateTaskState {
       return element.modality == modality;
     }).toList();
   }
+
+  int get tasksInProgress {
+    return tasks
+        .where((task) => task.status == TaskStatusEnum.inProgress)
+        .length;
+  }
 }

@@ -94,6 +94,7 @@ class AnnotateTaskBloc extends Bloc<AnnotateTaskEvent, AnnotateTaskState> {
             }).toList(),
           ),
         );
+        await publishedTask.saveTaskFile();
       } catch (e) {
         emit(
           state.copyWith(

@@ -188,4 +188,14 @@ final class TaskRepository extends BaseRepository {
       data: {"asset_id": task.id},
     );
   }
+
+  Future<List<AnnotatePublishModel>> listMyPublishes() async {
+    final res = await client.get("assets/publishes/me");
+    if (res.statusCode != 200) {
+      throw Exception("Failed to list my publishes");
+    }
+    return (res.data as List<dynamic>)
+        .map((e) => AnnotatePublishModel.fromJson(e))
+        .toList();
+  }
 }

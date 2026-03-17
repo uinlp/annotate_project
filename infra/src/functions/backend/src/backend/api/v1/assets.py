@@ -55,6 +55,13 @@ def list_publishes(
     return assets_repository.list_publishes(asset_id, publisher_id)
 
 
+@router.get("/publishes/me")
+def list_my_publishes(
+    user: dict = Depends(get_current_user_me),
+) -> list[AssetPublishModel]:
+    return assets_repository.list_publishes(publisher_id=user["sub"])
+
+
 @router.get("/")
 def list_assets(
     modality: Annotated[ModalityTypeEnum, Query()] | None = None,

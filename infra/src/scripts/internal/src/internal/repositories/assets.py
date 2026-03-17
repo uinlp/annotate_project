@@ -123,7 +123,7 @@ class AssetsRepository:
             )
         elif publisher_id:
             response = self.publishes_table.query(
-                IndexName="publisher-id-index",
+                IndexName="publisher-index",
                 KeyConditionExpression=Key("publisher_id").eq(publisher_id),
             )
         else:
