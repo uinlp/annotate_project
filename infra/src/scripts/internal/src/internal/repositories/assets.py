@@ -105,8 +105,10 @@ class AssetsRepository:
         )
         self.assets_table.update_item(
             Key={"id": model.asset_id},
-            UpdateExpression="SET total_publishes = total_publishes + :inc",
-            ExpressionAttributeValues={":inc": 1},
+            # UpdateExpression="SET total_publishes = total_publishes + :inc",
+            # ExpressionAttributeValues={":inc": 1},
+            UpdateExpression="SET total_publishes = if_not_exists(total_publishes, :zero) + :inc",
+            ExpressionAttributeValues={":inc": 1, ":zero": 0},
         )
 
     def verify_publish(self, model: AssetPublishCreateModel):
