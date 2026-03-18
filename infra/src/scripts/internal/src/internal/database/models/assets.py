@@ -23,6 +23,7 @@ class AssetModel(BaseModel):
     annotate_fields: list[AnnotateFieldModel]
     tags: list[str] = []
     total_publishes: int = 0
+    is_deleted: bool = False
 
 
 class AssetCreateModel(BaseModel):
