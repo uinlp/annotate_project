@@ -121,7 +121,7 @@ module "datasets_objects_bucket" {
       allowed_headers = ["*"]
       allowed_methods = ["GET", "PUT", "POST", "DELETE", "HEAD"]
       allowed_origins = ["*"]
-      expose_headers  = ["*"]
+      expose_headers  = ["ETag"]
       max_age_seconds = 3000
     }
   ])
@@ -141,7 +141,7 @@ module "datasets_temp_bucket" {
       allowed_headers = ["*"]
       allowed_methods = ["GET", "PUT", "POST", "DELETE", "HEAD"]
       allowed_origins = ["*"]
-      expose_headers  = ["*"]
+      expose_headers  = ["ETag"]
       max_age_seconds = 3000
     }
   ])
