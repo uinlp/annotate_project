@@ -1,36 +1,47 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# UINLP Admin Web App
 
-## Getting Started
+Admin dashboard for the UINLP annotation platform, built with **Next.js 15**.
 
-First, run the development server:
+## Stack
+
+- **Framework**: Next.js 15 (App Router)
+- **Styling**: Tailwind CSS
+- **Data Fetching**: TanStack Query
+- **Auth**: `oidc-client-ts` + Amazon Cognito
+- **Validation**: Zod · **Icons**: Lucide React
+
+## Setup
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+cp .env.example .env.local   # fill in Cognito values
+npm run dev                  # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Required environment variables (`.env.local`)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```env
+NEXT_PUBLIC_COGNITO_AUTHORITY=https://cognito-idp.<region>.amazonaws.com/<pool-id>
+NEXT_PUBLIC_COGNITO_CLIENT_ID=<client-id>
+NEXT_PUBLIC_COGNITO_REDIRECT_URI=http://localhost:3000/oauth2/callback
+NEXT_PUBLIC_COGNITO_LOGOUT_URI=http://localhost:3000/oauth2/logout
+NEXT_PUBLIC_COGNITO_DOMAIN=https://<domain>.auth.<region>.amazoncognito.com
+NEXT_PUBLIC_API_BASE_URL=http://localhost:8000
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Routes
 
-## Learn More
+| Path | Description |
+|---|---|
+| `/` | Public landing page |
+| `/admin` | Dashboard overview |
+| `/admin/datasets` | Dataset list |
+| `/admin/datasets/create` | Create a dataset |
+| `/admin/datasets/[id]` | Dataset detail & delete |
+| `/admin/assets` | Asset list |
+| `/admin/assets/upload` | Create an asset |
+| `/admin/assets/[id]` | Asset detail & publish downloads |
 
-To learn more about Next.js, take a look at the following resources:
+## Full documentation
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+See [`docs/web-app.md`](../docs/web-app.md).

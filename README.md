@@ -1,27 +1,37 @@
-# UINLP Project
+# UINLP — Annotation Platform
 
-## Overview
-A application for annotation tasks in natural language processing.
+A full-stack platform for collecting, distributing, and managing multi-modal annotation tasks at scale, powered by AWS.
 
-## Features
-- Core NLP functionality
-- Easy-to-use API
-- Efficient processing
+## Repositories
 
-## Installation
-```bash
+| Directory | Description |
+|---|---|
+| [`web_app/`](./web_app/README.md) | Next.js 15 admin dashboard |
+| `mobile_app/` | Flutter offline-first annotator app |
+| `infra/` | Terraform infrastructure + Python Lambda functions |
+| [`docs/`](./docs/README.md) | Full project documentation |
 
-```
-
-## Usage
-```python
+## Architecture
 
 ```
+Admin (web_app)  ──►  API Gateway  ──►  Backend Lambda (FastAPI)
+                                           │           │
+                                       DynamoDB       S3
+                                                       │
+                                       Batch Lambda ◄──┘
+                                       (splits ZIPs into batches)
+                                                       │
+Annotator (mobile_app)  ◄──────────────────────────────┘
+```
 
-## Requirements
+Authentication is handled by **Amazon Cognito** across all clients.
+
+## Quick Start
+
+- **Admin Dashboard**: see [`web_app/README.md`](./web_app/README.md)
+- **Full local setup**: see [`docs/getting-started.md`](./docs/getting-started.md)
+- **API reference**: see [`docs/api.md`](./docs/api.md)
 
 ## License
-MIT
 
-## Contributing
-Pull requests welcome. Please open an issue first to discuss changes.
+MIT
