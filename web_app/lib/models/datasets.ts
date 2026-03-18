@@ -10,6 +10,8 @@ export const DatasetModelSchema = z.object({
   batch_keys: z.array(z.string()).default([]),
   created_at: z.string(),
   updated_at: z.string(),
+  is_completed: z.boolean().default(false),
+  is_deleted: z.boolean().default(false),
 });
 
 export type DatasetModel = z.infer<typeof DatasetModelSchema>;

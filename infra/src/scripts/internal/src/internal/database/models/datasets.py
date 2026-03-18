@@ -14,6 +14,8 @@ class DatasetModel(BaseModel):
     batch_keys: list[str] = []
     created_at: datetime
     updated_at: datetime
+    is_completed: bool = False
+    is_deleted: bool = False
 
     @property
     def has_batches(self) -> bool:

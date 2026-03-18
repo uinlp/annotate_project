@@ -7,6 +7,7 @@ from internal.database.models.datasets import (
 from internal.database.models.shared import S3UrlModel
 import os
 import boto3
+from boto3.dynamodb.conditions import Attr
 import io
 import zipfile
 import itertools
@@ -28,7 +29,10 @@ class DatasetsRepository:
         self.datasets_table = self.dynamodb.Table(datasets_table_name)
 
     def list_datasets(self) -> list[DatasetModel]:
-        response = self.datasets_table.scan()
+        response = self.datasets_table.scan(
+            FilterExpression=Attr("is_completed").eq(True)
+            & Attr("is_deleted").eq(False)
+        )
         items = response["Items"]
         return [DatasetModel(**item) for item in items]
 
@@ -42,7 +46,12 @@ class DatasetsRepository:
         self.datasets_table.put_item(Item=dataset.model_dump(mode="json"))
 
     def delete_dataset(self, dataset_id: str) -> None:
-        self.datasets_table.delete_item(Key={"id": dataset_id})
+        # self.datasets_table.delete_item(Key={"id": dataset_id})
+        self.datasets_table.update_item(
+            Key={"id": dataset_id},
+            UpdateExpression="SET is_deleted = :is_deleted",
+            ExpressionAttributeValues={":is_deleted": True},
+        )
 
     def create_dataset(self, dataset: DatasetCreateModel) -> S3UrlModel:
         self.datasets_table.put_item(
@@ -116,37 +125,39 @@ class DatasetsRepository:
         ):
             logger.info(f"Modality: {dataset.modality}")
             batch_count = 1
-            
+
             valid_extensions = {
                 ModalityTypeEnum.IMAGE: (".jpg", ".jpeg", ".png", ".gif", ".webp"),
                 ModalityTypeEnum.AUDIO: (".mp3", ".wav", ".ogg", ".flac", ".m4a"),
                 ModalityTypeEnum.VIDEO: (".mp4", ".avi", ".mov", ".mkv", ".webm"),
             }[dataset.modality]
-            
+
             all_files = []
             for root, _, files in os.walk("/tmp/datasets"):
                 for filename in files:
                     if filename.lower().endswith(valid_extensions):
                         all_files.append(os.path.join(root, filename))
-            
+
             all_files.sort()
-            
+
             for i in range(0, len(all_files), batch_size):
-                batch_files = all_files[i:i + batch_size]
+                batch_files = all_files[i : i + batch_size]
                 self._upload_media_batch(batch_files, batch_count, dest_bucket, dataset)
                 batch_count += 1
-                
+
             shutil.rmtree("/tmp/datasets")
 
             self.datasets_table.put_item(Item=dataset.model_dump(mode="json"))
             logger.info("Dataset batched successfully")
-            
+
             self.s3_client.delete_object(
                 Bucket=bucket_name,
                 Key=object_key,
             )
         else:
             raise ValueError(f"Unknown modality: {dataset.modality}")
+        dataset.is_completed = True
+        self.datasets_table.put_item(Item=dataset.model_dump(mode="json"))
 
     def _upload_batch(self, batch, batch_idx, dest_bucket, dataset):
         """Helper to package and upload a single batch to S3."""
