@@ -114,8 +114,37 @@ class DatasetsRepository:
             ModalityTypeEnum.AUDIO,
             ModalityTypeEnum.VIDEO,
         ):
-            # TODO: Split the files into batches of batch_size
-            pass
+            logger.info(f"Modality: {dataset.modality}")
+            batch_count = 1
+            
+            valid_extensions = {
+                ModalityTypeEnum.IMAGE: (".jpg", ".jpeg", ".png", ".gif", ".webp"),
+                ModalityTypeEnum.AUDIO: (".mp3", ".wav", ".ogg", ".flac", ".m4a"),
+                ModalityTypeEnum.VIDEO: (".mp4", ".avi", ".mov", ".mkv", ".webm"),
+            }[dataset.modality]
+            
+            all_files = []
+            for root, _, files in os.walk("/tmp/datasets"):
+                for filename in files:
+                    if filename.lower().endswith(valid_extensions):
+                        all_files.append(os.path.join(root, filename))
+            
+            all_files.sort()
+            
+            for i in range(0, len(all_files), batch_size):
+                batch_files = all_files[i:i + batch_size]
+                self._upload_media_batch(batch_files, batch_count, dest_bucket, dataset)
+                batch_count += 1
+                
+            shutil.rmtree("/tmp/datasets")
+
+            self.datasets_table.put_item(Item=dataset.model_dump(mode="json"))
+            logger.info("Dataset batched successfully")
+            
+            self.s3_client.delete_object(
+                Bucket=bucket_name,
+                Key=object_key,
+            )
         else:
             raise ValueError(f"Unknown modality: {dataset.modality}")
 
@@ -131,6 +160,20 @@ class DatasetsRepository:
             batch_key = f"{dataset.id}/{batch_idx}.zip"
             self.s3_client.put_object(Bucket=dest_bucket, Key=batch_key, Body=output)
             logger.info(f"Uploaded batch: {batch_key}")
+            dataset.batch_keys.append(batch_key)
+
+    def _upload_media_batch(self, file_paths, batch_idx, dest_bucket, dataset):
+        """Helper to package and upload a batch of media files to S3."""
+        with io.BytesIO() as output:
+            with zipfile.ZipFile(output, "w", zipfile.ZIP_DEFLATED) as zipf:
+                for idx, file_path in enumerate(file_paths):
+                    ext = os.path.splitext(file_path)[1]
+                    zipf.write(file_path, arcname=f"data/{idx + 1}{ext}")
+
+            output.seek(0)
+            batch_key = f"{dataset.id}/{batch_idx}.zip"
+            self.s3_client.put_object(Bucket=dest_bucket, Key=batch_key, Body=output)
+            logger.info(f"Uploaded media batch: {batch_key}")
             dataset.batch_keys.append(batch_key)
 
     def create_batch_download_url(self, model: DatasetBatchDownloadCreateModel):

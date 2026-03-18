@@ -25,19 +25,24 @@ class AssetsRepository:
         self.assets_table = self.dynamodb.Table(assets_table_name)
         self.publishes_table = self.dynamodb.Table(publishes_table_name)
 
-    def list_assets(self, modality: ModalityTypeEnum | None = None) -> list[AssetModel]:
-        filter_expression = (
-            Attr("total_publishes").lt(self.ASSETS_PUBLISHES_LIMIT)
-            | Attr("total_publishes").not_exists()
-        )
-        if modality:
-            response = self.assets_table.query(
-                IndexName="modality-index",
-                KeyConditionExpression=Key("modality").eq(modality.value),
-                FilterExpression=filter_expression,
+    def list_assets(self, modality: ModalityTypeEnum | None = None, admin_all: bool = False) -> list[AssetModel]:
+        filter_expression = None
+        if not admin_all:
+            filter_expression = (
+                Attr("total_publishes").lt(self.ASSETS_PUBLISHES_LIMIT)
+                | Attr("total_publishes").not_exists()
             )
+
+        kwargs = {}
+        if filter_expression is not None:
+            kwargs["FilterExpression"] = filter_expression
+
+        if modality:
+            kwargs["IndexName"] = "modality-index"
+            kwargs["KeyConditionExpression"] = Key("modality").eq(modality.value)
+            response = self.assets_table.query(**kwargs)
         else:
-            response = self.assets_table.scan(FilterExpression=filter_expression)
+            response = self.assets_table.scan(**kwargs)
         items = response["Items"]
         return [AssetModel(**item) for item in items]
 

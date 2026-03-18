@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Request, Depends
+from fastapi.middleware.cors import CORSMiddleware
 from backend.api.v1 import router as v1_router
 from mangum import Mangum
 from aws_lambda_powertools.logging import Logger
@@ -27,6 +28,15 @@ app.include_router(router=v1_router, prefix="/v1", dependencies=[is_authenticate
 
 # Session middleware for OAuth2
 app.add_middleware(SessionMiddleware, secret_key=SECRET_KEY or "")
+
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.get("/", dependencies=[is_authenticated])

@@ -65,8 +65,9 @@ def list_my_publishes(
 @router.get("/")
 def list_assets(
     modality: Annotated[ModalityTypeEnum, Query()] | None = None,
+    admin_all: bool = False,
 ) -> list[AssetModel]:
-    return assets_repository.list_assets(modality)
+    return assets_repository.list_assets(modality, admin_all)
 
 
 @router.post("/")
