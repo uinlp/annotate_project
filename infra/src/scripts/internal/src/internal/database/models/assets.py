@@ -76,3 +76,6 @@ class AssetPublishModel(BaseModel):
 
 class AssetPublishBodyModel(BaseModel):
     asset_id: str
+
+
+#
