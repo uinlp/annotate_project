@@ -36,8 +36,8 @@ resource "aws_cognito_user_pool_client" "client" {
   name                                 = "uinlp-user-pool-client"
   user_pool_id                         = aws_cognito_user_pool.user_pool.id
   allowed_oauth_flows_user_pool_client = true
-  callback_urls                        = ["https://api.uinlp.org.ng/oauth2/callback", "http://localhost:3000/oauth2/callback"]
-  logout_urls                          = ["https://api.uinlp.org.ng/oauth2/logout", "http://localhost:3000/oauth2/logout"]
+  callback_urls                        = ["https://api.uinlp.org.ng/oauth2/callback", "http://localhost:3000/oauth2/callback", "https://annotate.uinlp.org.ng/oauth2/callback"]
+  logout_urls                          = ["https://api.uinlp.org.ng/oauth2/logout", "http://localhost:3000/oauth2/logout", "https://annotate.uinlp.org.ng/oauth2/logout"]
   default_redirect_uri                 = "https://api.uinlp.org.ng/oauth2/callback"
   allowed_oauth_flows                  = ["code", "implicit"]
   allowed_oauth_scopes                 = ["email", "openid", "profile"]

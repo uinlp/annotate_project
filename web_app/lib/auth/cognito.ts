@@ -16,6 +16,7 @@ export async function signOutRedirect () {
     const clientId = process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID || "";
     const logoutUri = process.env.NEXT_PUBLIC_COGNITO_LOGOUT_URI || "";
     const cognitoDomain = process.env.NEXT_PUBLIC_COGNITO_DOMAIN || "";
+    await userManager.removeUser();
     window.location.href = `${cognitoDomain}/logout?client_id=${clientId}&logout_uri=${encodeURIComponent(logoutUri)}`;
 };
 

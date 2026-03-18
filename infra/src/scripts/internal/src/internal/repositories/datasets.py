@@ -28,11 +28,17 @@ class DatasetsRepository:
 
         self.datasets_table = self.dynamodb.Table(datasets_table_name)
 
-    def list_datasets(self) -> list[DatasetModel]:
-        response = self.datasets_table.scan(
-            FilterExpression=Attr("is_completed").eq(True)
-            & Attr("is_deleted").eq(False)
-        )
+    def list_datasets(self, admin_all: bool = False) -> list[DatasetModel]:
+        filter_expression = None
+        if not admin_all:
+            filter_expression = Attr("is_completed").eq(True) & Attr("is_deleted").eq(
+                False
+            )
+
+        kwargs = {}
+        if filter_expression is not None:
+            kwargs["FilterExpression"] = filter_expression
+        response = self.datasets_table.scan(**kwargs)
         items = response["Items"]
         return [DatasetModel(**item) for item in items]
 

@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Database, FolderArchive } from "lucide-react";
+import { LayoutDashboard, Database, FolderArchive, LogOut } from "lucide-react";
+import { signOutRedirect } from "@/lib/auth/cognito";
 import clsx from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -22,7 +23,7 @@ export function Sidebar() {
   return (
     <aside className="fixed inset-y-0 left-0 z-50 flex w-72 flex-col border-r border-gray-200 bg-white/70 backdrop-blur-3xl dark:border-gray-800 dark:bg-gray-950/70 transition-transform md:translate-x-0 -translate-x-full">
       <div className="flex h-16 shrink-0 items-center px-6">
-        <span className="text-xl font-bold tracking-tight bg-gradient-to-r from-blue-600 to-indigo-500 bg-clip-text text-transparent">uiNLP Admin</span>
+        <span className="text-xl font-bold tracking-tight bg-gradient-to-r from-blue-600 to-indigo-500 bg-clip-text text-transparent">UINLP Admin</span>
       </div>
       <nav className="flex flex-1 flex-col px-4 py-4 overflow-y-auto space-y-2">
         {navLinks.map((link) => {
@@ -54,9 +55,19 @@ export function Sidebar() {
         })}
       </nav>
       <div className="border-t border-gray-200 dark:border-gray-800 p-4">
-        <div className="flex items-center gap-3 px-2">
-          <div className="h-8 w-8 rounded-full bg-gradient-to-tr from-purple-500 to-blue-500 shadow-inner flex items-center justify-center text-white text-xs font-bold">U</div>
-          <span className="text-sm font-medium dark:text-gray-200">Admin User</span>
+        <div className="flex items-center justify-between px-2">
+            <div className="flex items-center gap-3">
+                <div className="h-8 w-8 rounded-full bg-gradient-to-tr from-purple-500 to-blue-500 shadow-inner flex items-center justify-center text-white text-xs font-bold">U</div>
+                <span className="text-sm font-medium dark:text-gray-200">Admin User</span>
+            </div>
+            <button
+                onClick={() => signOutRedirect()}
+                type="button"
+                className="p-1.5 text-gray-500 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                title="Sign out"
+            >
+                <LogOut className="w-5 h-5" />
+            </button>
         </div>
       </div>
     </aside>

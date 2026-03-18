@@ -3,8 +3,8 @@ import { z } from "zod";
 import { apiClient } from "../api/client";
 
 export class DatasetsRepository {
-  static async listDatasets(): Promise<DatasetModel[]> {
-    const res = await apiClient.fetch(`/v1/datasets`, { cache: 'no-store' });
+  static async listDatasets(admin_all: boolean = false): Promise<DatasetModel[]> {
+    const res = await apiClient.fetch(`/v1/datasets?admin_all=${admin_all}`, { cache: 'no-store' });
     if (!res.ok) throw new Error("Failed to fetch datasets");
     const data = await res.json();
     return z.array(DatasetModelSchema).parse(data);

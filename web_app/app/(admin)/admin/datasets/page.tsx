@@ -9,15 +9,15 @@ import { DatasetModel } from "@/lib/models/datasets";
 export default function DatasetsPage() {
   const { data: datasets = [], isPending, isError } = useQuery<DatasetModel[]>({
     queryKey: ['datasets'],
-    queryFn: () => DatasetsRepository.listDatasets(),
+    queryFn: () => DatasetsRepository.listDatasets(true),
   });
 
   if (isPending) {
-      return (
-          <div className="flex h-[50vh] items-center justify-center">
-              <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-blue-600"></div>
-          </div>
-      );
+    return (
+      <div className="flex h-[50vh] items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-blue-600"></div>
+      </div>
+    );
   }
 
   return (
@@ -36,10 +36,10 @@ export default function DatasetsPage() {
           </Link>
         </div>
       </div>
-      
+
       {isError && (
         <div className="rounded-xl border border-red-200 bg-red-50 p-4 dark:border-red-900/50 dark:bg-red-900/20">
-            <p className="text-sm text-red-600 dark:text-red-400">Failed to connect to the backend APIs. Are you authenticated?</p>
+          <p className="text-sm text-red-600 dark:text-red-400">Failed to connect to the backend APIs. Are you authenticated?</p>
         </div>
       )}
 
@@ -73,10 +73,21 @@ export default function DatasetsPage() {
                   <span className="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10 dark:bg-blue-900/30 dark:text-blue-400 dark:ring-blue-400/20">
                     {dataset.modality.toUpperCase()}
                   </span>
+                  {dataset.is_completed ? (
+                      <span className="inline-flex items-center gap-1.5 rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20 dark:bg-green-900/30 dark:text-green-400 dark:ring-green-400/20">
+                          <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                          Ready
+                      </span>
+                  ) : (
+                      <span className="inline-flex items-center gap-1.5 rounded-md bg-yellow-50 px-2 py-1 text-xs font-medium text-yellow-800 ring-1 ring-inset ring-yellow-600/20 dark:bg-yellow-900/30 dark:text-yellow-500 dark:ring-yellow-400/20">
+                          <div className="w-1.5 h-1.5 rounded-full bg-yellow-500 animate-pulse" />
+                          Processing
+                      </span>
+                  )}
                   <div className="hidden sm:flex sm:flex-col sm:items-end">
                     <p className="text-sm leading-6 text-gray-900 dark:text-white">Batch Size: {dataset.batch_size}</p>
                     <p className="mt-1 text-xs leading-5 text-gray-500 dark:text-gray-400">
-                        {new Date(dataset.created_at).toLocaleDateString()}
+                      {new Date(dataset.created_at).toLocaleDateString()}
                     </p>
                   </div>
                 </div>

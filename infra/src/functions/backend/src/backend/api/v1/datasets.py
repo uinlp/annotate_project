@@ -1,5 +1,5 @@
 from fastapi.routing import APIRouter
-from fastapi import Path
+from fastapi import Path, Query
 from typing import Annotated
 
 from internal.database.models.datasets import (
@@ -17,8 +17,10 @@ datasets_repository = DatasetsRepository()
 
 
 @router.get("/")
-def list_datasets() -> list[DatasetModel]:
-    return datasets_repository.list_datasets()
+def list_datasets(
+    admin_all: Annotated[bool, Query()] = False,
+) -> list[DatasetModel]:
+    return datasets_repository.list_datasets(admin_all)
 
 
 @router.post("/")
