@@ -1,37 +1,32 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Database, FolderArchive, Users, Activity } from "lucide-react";
 import { DatasetsRepository } from "@/lib/repositories/datasets";
 import { AssetsRepository } from "@/lib/repositories/assets";
 import Link from "next/link";
 
 export default function AdminPage() {
-  const [datasetCount, setDatasetCount] = useState<number | null>(null);
-  const [assetCount, setAssetCount] = useState<number | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { data: datasets, isPending: datasetsLoading } = useQuery({
+    queryKey: ['datasets'],
+    queryFn: () => DatasetsRepository.listDatasets(),
+  });
 
-  useEffect(() => {
-    Promise.all([
-      DatasetsRepository.listDatasets().catch(() => []),
-      AssetsRepository.listAssets(undefined, true).catch(() => [])
-    ]).then(([datasets, assets]) => {
-      setDatasetCount(datasets.length);
-      setAssetCount(assets.length);
-      setLoading(false);
-    });
-  }, []);
+  const { data: assets, isPending: assetsLoading } = useQuery({
+    queryKey: ['assets', 'adminAll'],
+    queryFn: () => AssetsRepository.listAssets(undefined, true),
+  });
 
   const stats = [
     { 
       name: "Total Datasets", 
-      stat: loading || datasetCount === null ? "..." : datasetCount.toString(), 
+      stat: datasetsLoading ? "..." : datasets?.length?.toString() || "0", 
       icon: Database, 
       link: "/admin/datasets" 
     },
     { 
       name: "Total Assets", 
-      stat: loading || assetCount === null ? "..." : assetCount.toString(), 
+      stat: assetsLoading ? "..." : assets?.length?.toString() || "0", 
       icon: FolderArchive, 
       link: "/admin/assets" 
     },

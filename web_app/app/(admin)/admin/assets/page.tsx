@@ -1,30 +1,18 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { AssetsRepository } from "@/lib/repositories/assets";
 import { FolderArchive, Upload, Database } from "lucide-react";
 import Link from "next/link";
 import { AssetModel } from "@/lib/models/assets";
 
 export default function AssetsPage() {
-  const [assets, setAssets] = useState<AssetModel[]>([]);
-  const [fetchError, setFetchError] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const { data: assets = [], isPending, isError } = useQuery<AssetModel[]>({
+    queryKey: ['assets', 'adminAll'],
+    queryFn: () => AssetsRepository.listAssets(undefined, true),
+  });
 
-  useEffect(() => {
-    AssetsRepository.listAssets(undefined, true)
-      .then((data) => {
-        setAssets(data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error(err);
-        setFetchError(true);
-        setLoading(false);
-      });
-  }, []);
-
-  if (loading) {
+  if (isPending) {
       return (
           <div className="flex h-[50vh] items-center justify-center">
               <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-blue-600"></div>
@@ -49,13 +37,13 @@ export default function AssetsPage() {
         </div>
       </div>
       
-      {fetchError && (
+      {isError && (
         <div className="rounded-xl border border-red-200 bg-red-50 p-4 dark:border-red-900/50 dark:bg-red-900/20">
             <p className="text-sm text-red-600 dark:text-red-400">Failed to connect to the backend APIs. Are you authenticated?</p>
         </div>
       )}
 
-      {!fetchError && assets.length === 0 ? (
+      {!isError && assets.length === 0 ? (
         <div className="rounded-2xl bg-white dark:bg-gray-900 shadow-sm border border-gray-100 dark:border-gray-800 overflow-hidden">
           <div className="px-4 py-16 sm:p-16 text-center text-gray-500 dark:text-gray-400">
             <FolderArchive className="mx-auto h-12 w-12 text-gray-300 dark:text-gray-600 mb-4" />
@@ -87,7 +75,7 @@ export default function AssetsPage() {
                 </div>
                 <div className="flex shrink-0 items-center gap-x-4 z-10">
                   <span className="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10 dark:bg-blue-900/30 dark:text-blue-400 dark:ring-blue-400/20">
-                    {asset.modality}
+                    {asset.modality.toUpperCase()}
                   </span>
                   <div className="hidden sm:flex sm:flex-col sm:items-end">
                     <p className="text-sm leading-6 text-gray-900 dark:text-white">Publishes: {asset.total_publishes}</p>

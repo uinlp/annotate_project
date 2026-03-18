@@ -42,6 +42,13 @@ def acknowledge_publish(
     return assets_repository.publish_asset(model)
 
 
+@router.post("/publish-download-url")
+def create_publish_download_url(
+    body: AssetPublishCreateModel, user: dict = Depends(get_current_user_me)
+) -> S3UrlModel:
+    return assets_repository.create_publish_download_url(body)
+
+
 @router.post("/publishes/verify")
 def verify_publish(create_model: AssetPublishCreateModel) -> None:
     return assets_repository.verify_publish(create_model)

@@ -34,3 +34,15 @@ export const AssetCreateModelSchema = z.object({
 });
 
 export type AssetCreateModel = z.infer<typeof AssetCreateModelSchema>;
+
+export const AssetPublishModelSchema = z.object({
+  asset_id: z.string(),
+  publisher_id: z.string(),
+  is_verified: z.boolean().default(false),
+  is_published: z.boolean().default(false),
+  publish_key: z.string(),
+  created_at: z.string(),
+  updated_at: z.string(),
+});
+
+export type AssetPublishModel = z.infer<typeof AssetPublishModelSchema>;

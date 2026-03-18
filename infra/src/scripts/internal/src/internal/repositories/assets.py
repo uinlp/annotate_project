@@ -25,7 +25,9 @@ class AssetsRepository:
         self.assets_table = self.dynamodb.Table(assets_table_name)
         self.publishes_table = self.dynamodb.Table(publishes_table_name)
 
-    def list_assets(self, modality: ModalityTypeEnum | None = None, admin_all: bool = False) -> list[AssetModel]:
+    def list_assets(
+        self, modality: ModalityTypeEnum | None = None, admin_all: bool = False
+    ) -> list[AssetModel]:
         filter_expression = None
         if not admin_all:
             filter_expression = (
@@ -51,6 +53,13 @@ class AssetsRepository:
         if "Item" not in response:
             raise ValueError(f"Asset with id {asset_id} not found")
         return AssetModel(**response["Item"])
+
+    # def get_asset_admin(self, asset_id: str) -> AssetAdminModel:
+    #     response = self.assets_table.get_item(Key={"id": asset_id})
+    #     if "Item" not in response:
+    #         raise ValueError(f"Asset with id {asset_id} not found")
+    #     publishes = self.list_publishes(asset_id)
+    #     return AssetAdminModel(**response["Item"], publishes=publishes)
 
     def update_asset(self, asset: AssetModel) -> None:
         self.assets_table.put_item(Item=asset.model_dump(mode="json"))
@@ -134,3 +143,16 @@ class AssetsRepository:
         else:
             response = self.publishes_table.scan()
         return [AssetPublishModel(**item) for item in response["Items"]]
+
+    def create_publish_download_url(self, model: AssetPublishCreateModel):
+        bucket = os.environ["PUBLISHES_BUCKET_NAME"]
+        key = f"{model.asset_id}/{model.publisher_id}.zip"
+        url = self.s3_client.generate_presigned_url(
+            "get_object",
+            Params={
+                "Bucket": bucket,
+                "Key": key,
+            },
+            ExpiresIn=3600,
+        )
+        return S3UrlModel(url=url, expires_in=3600)

@@ -1,18 +1,17 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useQuery } from "@tanstack/react-query";
 import { AssetsRepository } from "@/lib/repositories/assets";
 import { DatasetsRepository } from "@/lib/repositories/datasets";
 import { AssetCreateModelSchema } from "@/lib/models/assets";
-import { DatasetModel } from "@/lib/models/datasets";
 import { Plus, Trash2 } from "lucide-react";
 
 export default function UploadAssetPage() {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [datasets, setDatasets] = useState<DatasetModel[]>([]);
   
   const [formData, setFormData] = useState({
     name: "",
@@ -23,12 +22,10 @@ export default function UploadAssetPage() {
 
   const [annotateFields, setAnnotateFields] = useState([{ name: "", description: "", modality: "text" }]);
 
-  useEffect(() => {
-    // Load datasets
-    DatasetsRepository.listDatasets()
-        .then(res => setDatasets(res))
-        .catch(err => console.error("Could not load datasets", err));
-  }, []);
+  const { data: datasets = [], isPending: datasetsLoading } = useQuery({
+    queryKey: ['datasets'],
+    queryFn: () => DatasetsRepository.listDatasets(),
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -110,10 +107,11 @@ export default function UploadAssetPage() {
                   id="dataset_id"
                   name="dataset_id"
                   value={formData.dataset_id}
+                  disabled={datasetsLoading}
                   onChange={(e) => setFormData({ ...formData, dataset_id: e.target.value })}
-                  className="block w-full rounded-xl border-0 py-2.5 px-3 text-gray-900 dark:text-white dark:bg-black/20 shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-700 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                  className="block w-full rounded-xl border-0 py-2.5 px-3 text-gray-900 dark:text-white dark:bg-black/20 shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-700 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:max-w-xs sm:text-sm sm:leading-6 disabled:opacity-50"
                 >
-                  <option value="" disabled>Select a dataset...</option>
+                  <option value="" disabled>{datasetsLoading ? "Loading datasets..." : "Select a dataset..."}</option>
                   {datasets.map(d => <option key={d.id} value={d.id}>{d.name} ({d.id})</option>)}
                 </select>
               </div>
