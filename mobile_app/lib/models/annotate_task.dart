@@ -143,6 +143,11 @@ class AnnotateTaskModel {
     await taskFile.writeAsString(jsonEncode(toJson()));
   }
 
+  Future<void> delete() async {
+    final workingDir = await taskPath;
+    await workingDir.delete(recursive: true);
+  }
+
   factory AnnotateTaskModel.fromJson(Map<String, dynamic> json) {
     return AnnotateTaskModel(
       id: json['id'],

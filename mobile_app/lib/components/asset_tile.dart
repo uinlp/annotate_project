@@ -1,3 +1,4 @@
+import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -40,7 +41,7 @@ class AssetTile extends StatelessWidget {
           ),
         ),
         title: Text(
-          asset.name,
+          asset.name.toTitleCase(),
           style: theme.textTheme.titleMedium?.copyWith(
             fontWeight: FontWeight.bold,
           ),
@@ -50,7 +51,7 @@ class AssetTile extends StatelessWidget {
           children: [
             const SizedBox(height: 4),
             Text(
-              asset.description,
+              asset.description.capitalized,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),

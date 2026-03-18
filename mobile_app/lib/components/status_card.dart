@@ -94,15 +94,15 @@ class SuccessCard extends StatelessWidget {
 }
 
 class InfoCard extends StatelessWidget {
-  const InfoCard({super.key, required this.message, this.actions});
-
+  const InfoCard({super.key, required this.message, this.actions, this.title});
+  final String? title;
   final String message;
   final List<Widget>? actions;
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text("Info"),
+      title: Text(title ?? "Info"),
       content: Text(message),
       actions:
           actions ??
@@ -172,14 +172,19 @@ showSuccessDialog(
   );
 }
 
-showInfoDialog(BuildContext context, String message, {List<Widget>? actions}) {
+showInfoDialog(
+  BuildContext context,
+  String message, {
+  List<Widget>? actions,
+  String? title,
+}) {
   hideLoadingDialog(context);
   return showDialog(
     context: context,
     routeSettings: RouteSettings(name: "info-dialog"),
     barrierDismissible: false,
     builder: (context) {
-      return InfoCard(message: message, actions: actions);
+      return InfoCard(message: message, actions: actions, title: title);
     },
   );
 }

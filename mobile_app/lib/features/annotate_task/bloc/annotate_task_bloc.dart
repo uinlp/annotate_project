@@ -107,5 +107,30 @@ class AnnotateTaskBloc extends Bloc<AnnotateTaskEvent, AnnotateTaskState> {
       }
       emit(state.copyWith(status: const IdleStatus()));
     });
+    on<DeleteAnnotateTaskEvent>((event, emit) async {
+      debugPrint("Deleting annotate task");
+      emit(state.copyWith(status: LoadingStatus(event: event)));
+      try {
+        final task = state.tasks.firstWhere((task) => task.id == event.id);
+        await task.delete();
+        debugPrint("Deleted annotate task: ${event.id}");
+        emit(
+          state.copyWith(
+            status: SuccessStatus(data: event.id, event: event),
+            tasks: state.tasks.where((task) => task.id != event.id).toList(),
+          ),
+        );
+      } catch (e) {
+        emit(
+          state.copyWith(
+            status: ErrorStatus(
+              event: event,
+              data: RepositoryException.fromCatch(e),
+            ),
+          ),
+        );
+      }
+      emit(state.copyWith(status: const IdleStatus()));
+    });
   }
 }

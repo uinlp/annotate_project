@@ -22,7 +22,10 @@ class RecentTasksScreen extends StatelessWidget {
             return LoadingCard();
           }
           if (state.tasks.isEmpty) {
-            return ErrorCard(title: "Error", message: "No recent tasks");
+            return ErrorCard(
+              title: "No recent tasks",
+              message: "You haven't created any tasks yet.",
+            );
           }
           return GridView.extent(
             padding: const EdgeInsets.all(16),
@@ -31,7 +34,7 @@ class RecentTasksScreen extends StatelessWidget {
             crossAxisSpacing: 16,
             childAspectRatio:
                 MediaQuery.sizeOf(context).width /
-                (MediaQuery.sizeOf(context).width < 850 ? 125 : 250),
+                (MediaQuery.sizeOf(context).width < 850 ? 160 : 285),
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             children: List.generate(state.tasks.length, (index) {

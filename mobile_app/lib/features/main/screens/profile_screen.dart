@@ -1,6 +1,8 @@
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:uinlp_annotate/components/status_card.dart';
+import 'package:uinlp_annotate/features/annotate_task/bloc/annotate_task_bloc.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -126,6 +128,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       foregroundColor: theme.colorScheme.onErrorContainer,
                     ).copyWith(elevation: ButtonStyleButton.allOrNull(0)),
                   ),
+                  // const Divider(),
+                  // Text("Recent Tasks Panel", style: theme.textTheme.headlineSmall),
+                  // BlocBuilder<AnnotateTaskBloc, AnnotateTaskState>(
+                  //   builder: (context, state) {
+                  //     return Column(
+                  //       children: [
+                  //         for (final task in state.tasks)
+
+                  //       ],
+                  //     );
+                  //   },
+                  // ),
                 ],
               ),
             ),

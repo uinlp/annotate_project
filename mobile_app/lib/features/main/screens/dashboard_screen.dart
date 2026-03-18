@@ -211,27 +211,22 @@ class _DashboardScreenState extends State<DashboardScreen> {
     String label,
     IconData icon,
   ) {
-    return Row(
+    return Column(
       children: [
-        Icon(icon, color: theme.colorScheme.primary, size: 48),
-        const SizedBox(width: 8),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              value,
-              style: theme.textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: theme.colorScheme.onPrimaryContainer,
-              ),
-            ),
-            Text(
-              label,
-              style: theme.textTheme.labelMedium?.copyWith(
-                color: theme.colorScheme.onPrimaryContainer.withOpacity(0.7),
-              ),
-            ),
-          ],
+        Icon(icon, color: theme.colorScheme.primary, size: 32),
+        const SizedBox(height: 8),
+        Text(
+          value,
+          style: theme.textTheme.titleLarge?.copyWith(
+            fontWeight: FontWeight.bold,
+            color: theme.colorScheme.onPrimaryContainer,
+          ),
+        ),
+        Text(
+          label,
+          style: theme.textTheme.labelMedium?.copyWith(
+            color: theme.colorScheme.onPrimaryContainer.withOpacity(0.7),
+          ),
         ),
       ],
     );
@@ -360,7 +355,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
         }
         if (state.tasks.isEmpty) {
           return SliverToBoxAdapter(
-            child: ErrorCard(title: "Error", message: "No recent tasks"),
+            child: ErrorCard(
+              title: "No recent tasks",
+              message: "You haven't created any tasks yet.",
+              actions: [],
+            ),
           );
         }
         return SliverToBoxAdapter(
@@ -371,7 +370,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             crossAxisSpacing: 16,
             childAspectRatio:
                 MediaQuery.sizeOf(context).width /
-                (MediaQuery.sizeOf(context).width < 850 ? 125 : 250),
+                (MediaQuery.sizeOf(context).width < 850 ? 160 : 285),
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             children: List.generate(min(state.tasks.length, 10), (index) {

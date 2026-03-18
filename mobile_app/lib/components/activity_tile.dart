@@ -1,7 +1,10 @@
+import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:uinlp_annotate/components/status_card.dart';
+import 'package:uinlp_annotate/features/annotate_task/bloc/annotate_task_bloc.dart';
 import 'package:uinlp_annotate/features/annotate_task/screens/annotate_editor_screen.dart';
 import 'package:uinlp_annotate/models/annotate_task.dart';
 import 'package:uinlp_annotate/utilities/helper.dart';
@@ -38,18 +41,49 @@ class ActivityTile extends StatelessWidget {
             size: 20,
           ),
         ),
-        title: Text(
-          task.name,
-          style: theme.textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.bold,
-          ),
+        title: Row(
+          children: [
+            Expanded(
+              child: Text(
+                task.name.toTitleCase(),
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            IconButton(
+              icon: Icon(Icons.delete, color: theme.colorScheme.error),
+              onPressed: () {
+                showInfoDialog(
+                  context,
+                  "This task (${task.name}) is about to be deleted. Are you sure?",
+                  title: "Delete Task",
+                  actions: [
+                    TextButton(
+                      onPressed: () => context.pop(),
+                      child: const Text("Cancel"),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        context.read<AnnotateTaskBloc>().add(
+                          DeleteAnnotateTaskEvent(id: task.id),
+                        );
+                        context.pop();
+                      },
+                      child: const Text("Delete"),
+                    ),
+                  ],
+                );
+              },
+            ),
+          ],
         ),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 4),
             Text(
-              task.description,
+              task.description.capitalized,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),

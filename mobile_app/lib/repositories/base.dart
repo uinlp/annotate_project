@@ -58,9 +58,9 @@ base class BaseRepository {
   }
 
   static Future<Directory> getWorkspaceDirectory() async {
-    // final appDocDir = await getApplicationDocumentsDirectory();
-    final appDocDir = await getExternalStorageDirectory();
-    final workspaceDir = Directory("${appDocDir!.path}/uinlp_workspace");
+    final appDocDir = await getApplicationDocumentsDirectory();
+    // final appDocDir = await getExternalStorageDirectory();
+    final workspaceDir = Directory("${appDocDir.path}/uinlp_workspace");
     if (!await workspaceDir.exists()) {
       await workspaceDir.create(recursive: true);
     }
