@@ -38,3 +38,7 @@ module "apis" {
   user_pool_endpoint   = module.authentications.user_pool_endpoint
   user_pool_authority  = module.authentications.user_pool_authority
 }
+
+module "user_interfaces" {
+  source = "../../modules/user_interfaces"
+}
