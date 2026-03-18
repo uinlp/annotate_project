@@ -116,13 +116,15 @@ module "datasets_objects_bucket" {
   control_object_ownership = true
   object_ownership         = "ObjectWriter"
 
-  cors_rule = {
-    allowed_headers = ["*"]
-    allowed_methods = ["GET", "PUT", "POST", "DELETE", "HEAD"]
-    allowed_origins = ["*"]
-    expose_headers  = ["*"]
-    max_age_seconds = 3000
-  }
+  cors_rule = jsonencode([
+    {
+      allowed_headers = ["*"]
+      allowed_methods = ["GET", "PUT", "POST", "DELETE", "HEAD"]
+      allowed_origins = ["*"]
+      expose_headers  = ["*"]
+      max_age_seconds = 3000
+    }
+  ])
 }
 
 module "datasets_temp_bucket" {
@@ -134,13 +136,15 @@ module "datasets_temp_bucket" {
   control_object_ownership = true
   object_ownership         = "ObjectWriter"
 
-  cors_rule = {
-    allowed_headers = ["*"]
-    allowed_methods = ["GET", "PUT", "POST", "DELETE", "HEAD"]
-    allowed_origins = ["*"]
-    expose_headers  = ["*"]
-    max_age_seconds = 3000
-  }
+  cors_rule = jsonencode([
+    {
+      allowed_headers = ["*"]
+      allowed_methods = ["GET", "PUT", "POST", "DELETE", "HEAD"]
+      allowed_origins = ["*"]
+      expose_headers  = ["*"]
+      max_age_seconds = 3000
+    }
+  ])
 }
 
 module "assets_publishes_bucket" {
